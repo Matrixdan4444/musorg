@@ -1,0 +1,22 @@
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# Local temp / runtime
+.tmp-home/
+.tmp-phase3-home/
+.tmp-phase3-library/
+.omx/
+.agents/
+.cursorrules
+skills-lock.json
