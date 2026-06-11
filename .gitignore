@@ -12,8 +12,9 @@ frontend/*.tsbuildinfo
 # macOS
 .DS_Store
 
-# Personal library test runs (not the unit suite in tests/)
-test/
+# Personal library test-run outputs (the match-stress driver + manifest in
+# test/ are tracked because tests/test_match_stress_parts.py needs them)
+test/results/
 
 # Local temp / runtime
 .tmp-home/
