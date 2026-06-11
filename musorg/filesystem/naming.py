@@ -132,7 +132,7 @@ def extract_year(value: str | None) -> str:
     return cleaned[-4:] if len(cleaned) >= 4 else "0000"
 
 
-_DUPLICATE_LEADING_YEAR_RE = re.compile(r"^(\d{4})(\s*[-–_.]\s*)\1((?:[\s\-–_.].*)?)$")
+_DUPLICATE_LEADING_YEAR_RE = re.compile(r"^(\d{4})(\s*[-–—_.]\s*)\1((?:[\s\-–—_.].*)?)$")
 
 
 def collapse_duplicate_leading_year(segment: str) -> str:

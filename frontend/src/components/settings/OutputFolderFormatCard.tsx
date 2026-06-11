@@ -8,6 +8,7 @@ import { useI18n } from "@/i18n/useI18n";
 import {
   albumFolderPresetOrder,
   buildOutputPreviewTree,
+  collapseDuplicateLeadingYear,
   defaultOutputFormatSettings,
   discHandlingOrder,
   fileNamingOrder,
@@ -486,7 +487,7 @@ function buildFolderPresetCards(t: (key: string, values?: Record<string, string 
     artist_year_album: {
       title: t("settings.outputFormat.presets.artistYearAlbum.title"),
       description: t("settings.outputFormat.presets.artistYearAlbum.description"),
-      preview: [`${album.albumArtist}/${album.year} - ${album.title}`],
+      preview: [`${album.albumArtist}/${collapseDuplicateLeadingYear(`${album.year} - ${album.title}`)}`],
     },
     artist_album_year: {
       title: t("settings.outputFormat.presets.artistAlbumYear.title"),

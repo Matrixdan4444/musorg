@@ -158,9 +158,9 @@ export function previewAlbumFromWorkspace(input: {
   };
 }
 
-const DUPLICATE_LEADING_YEAR_RE = /^(\d{4})(\s*[-–_.]\s*)\1((?:[\s\-–_.].*)?)$/;
+const DUPLICATE_LEADING_YEAR_RE = /^(\d{4})(\s*[-–—_.]\s*)\1((?:[\s\-–—_.].*)?)$/;
 
-function collapseDuplicateLeadingYear(segment: string): string {
+export function collapseDuplicateLeadingYear(segment: string): string {
   const match = DUPLICATE_LEADING_YEAR_RE.exec(segment.trim());
   if (!match) {
     return segment;
