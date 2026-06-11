@@ -222,6 +222,10 @@
 }
 
 @layer components {
+  .font-brand {
+    font-family: "Quicksand", ui-sans-serif, sans-serif;
+  }
+
   .app-shell-grid {
     @apply grid min-h-screen grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)];
   }

@@ -278,7 +278,7 @@ export function AlbumInspector({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)_64px_64px] gap-2">
           {(["genre", "year", "disc"] as const).map((field) => (
             <label
               key={field}

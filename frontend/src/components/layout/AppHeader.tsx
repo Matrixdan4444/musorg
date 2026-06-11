@@ -64,7 +64,7 @@ export function AppHeader({
               type="button"
               onClick={onOpenLibraryPicker}
             >
-              <FolderClosed className="h-4 w-4 text-muted-foreground" />
+              <FolderClosed className="h-5 w-5 shrink-0 text-muted-foreground" />
               <span className="truncate">{libraryPath}</span>
               <span className={cn("hidden text-[11px] sm:inline", statusTone)}>{libraryStatusLabel}</span>
               <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
