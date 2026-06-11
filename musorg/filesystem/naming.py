@@ -132,6 +132,22 @@ def extract_year(value: str | None) -> str:
     return cleaned[-4:] if len(cleaned) >= 4 else "0000"
 
 
+_DUPLICATE_LEADING_YEAR_RE = re.compile(r"^(\d{4})(\s*[-–_.]\s*)\1((?:[\s\-–_.].*)?)$")
+
+
+def collapse_duplicate_leading_year(segment: str) -> str:
+    """Collapse an immediately repeated leading 4-digit year in a folder segment.
+
+    Prevents "2024 - 2024 - Album" when the album title already begins with the
+    release year. Only triggers when the exact same year appears twice in a row
+    at the very start, so titles like "1984" or "1989 (2014)" are left untouched.
+    """
+    match = _DUPLICATE_LEADING_YEAR_RE.match(segment.strip())
+    if not match:
+        return segment
+    return f"{match.group(1)}{match.group(3)}".strip()
+
+
 def preferred_folder_artist(album_artist: str | None, track_artist: str | None) -> str:
     if album_artist:
         return canonical_artist_name(primary_artist(album_artist)) or primary_artist(album_artist)
@@ -392,7 +408,7 @@ def _album_folder_segments(track: dict, settings: dict[str, object]) -> list[str
         return [genre, artist, album]
     if preset == "custom":
         return _custom_album_segments(track, settings)
-    return [artist, f"{year} - {album}"]
+    return [artist, collapse_duplicate_leading_year(f"{year} - {album}")]
 
 
 def _custom_album_segments(track: dict, settings: dict[str, object]) -> list[str]:
@@ -409,7 +425,7 @@ def _custom_album_segments(track: dict, settings: dict[str, object]) -> list[str
         value = _custom_token_value(track, token)
         if value:
             segments[-1].append(value)
-    compact = [" - ".join(part).strip() for part in segments if part]
+    compact = [collapse_duplicate_leading_year(" - ".join(part).strip()) for part in segments if part]
     return compact or _album_folder_segments(track, {**settings, "album_folder_preset": "artist_year_album"})
 
 

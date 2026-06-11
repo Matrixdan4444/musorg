@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { CoverImage } from "@/components/music/CoverImage";
 import { Panel } from "@/components/Panel";
 import { IssueBadge } from "@/components/music/IssueBadge";
-import { MetadataPill } from "@/components/music/MetadataPill";
 import { useI18n } from "@/i18n/useI18n";
 import { cn } from "@/lib/cn";
 import {
@@ -264,12 +263,10 @@ export function AlbumInspector({
             {t("inspector.albumArtist")}
           </p>
           <div className={cn("rounded-[18px] border border-border-soft/75 bg-surface-subtle/85 px-4 py-3", dirtyFields.albumArtist && "border-[hsl(var(--ring)/0.6)]")}>
-            <MetadataPill
-              className="rounded-[18px] bg-transparent px-0 py-0"
-              icon={<UserRound className="h-4 w-4" />}
-              label={t("inspector.artist")}
-              value=""
-            />
+            <span className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+              <UserRound className="h-3.5 w-3.5" />
+              {t("inspector.artist")}
+            </span>
             <input
               className="mt-2 w-full bg-transparent text-[13px] text-[hsl(var(--text-base))] outline-none"
               value={form.albumArtist}
