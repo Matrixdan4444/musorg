@@ -1,8 +1,12 @@
 # musorg
 
+[![CI](https://github.com/Matrixdan4444/musorg/actions/workflows/ci.yml/badge.svg)](https://github.com/Matrixdan4444/musorg/actions/workflows/ci.yml)
+
 Desktop app for organizing a music library. It scans your folders, matches each
 album against online databases, cleans up the metadata, and lays the files out
 into a consistent `Artist/Album` structure.
+
+![Musorg](docs/ui-reference/current_ui_reference.png)
 
 ## Features
 
