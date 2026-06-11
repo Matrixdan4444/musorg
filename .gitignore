@@ -12,6 +12,9 @@ frontend/*.tsbuildinfo
 # macOS
 .DS_Store
 
+# Personal library test runs (not the unit suite in tests/)
+test/
+
 # Local temp / runtime
 .tmp-home/
 .tmp-phase3-home/
