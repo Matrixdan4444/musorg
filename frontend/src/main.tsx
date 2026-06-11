@@ -3,10 +3,6 @@ import ReactDOM from "react-dom/client";
 import App from "@/App";
 import { I18nProvider } from "@/i18n/provider";
 import { ThemeProvider, bootstrapStoredAppearance } from "@/theme/provider";
-import "@fontsource/quicksand/400.css";
-import "@fontsource/quicksand/500.css";
-import "@fontsource/quicksand/600.css";
-import "@fontsource/quicksand/700.css";
 import "@/styles/globals.css";
 
 bootstrapStoredAppearance();

@@ -5,9 +5,10 @@
 @layer base {
   :root {
     color-scheme: dark;
-    /* UI font. Logo style = Quicksand. To revert to the classic stack, set:
+    /* UI + logo font = Apple SF Pro Rounded (system, no embedding). To revert to
+       the classic stack, set:
        --font-ui: Inter, "SF Pro Display", "Segoe UI", sans-serif; */
-    --font-ui: "Quicksand", ui-sans-serif, system-ui, sans-serif;
+    --font-ui: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
     --background: 228 28% 8%;
     --foreground: 220 26% 95%;
     --panel: 228 23% 10%;
@@ -209,7 +210,6 @@
 
   body {
     font-family: var(--font-ui);
-    font-weight: 700;
     background-image:
       radial-gradient(circle at top, hsl(var(--accent-glow-a) / 0.16), transparent 24%),
       radial-gradient(circle at bottom right, hsl(var(--accent-glow-b) / 0.12), transparent 18%);
@@ -223,7 +223,7 @@
 
 @layer components {
   .font-brand {
-    font-family: "Quicksand", ui-sans-serif, sans-serif;
+    font-family: var(--font-ui);
   }
 
   .app-shell-grid {
