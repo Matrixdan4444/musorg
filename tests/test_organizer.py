@@ -1075,6 +1075,9 @@ class CollapseDuplicateLeadingYearTests(unittest.TestCase):
     def test_does_not_collapse_different_years(self):
         self.assertEqual(collapse_duplicate_leading_year("2014 - 2024 - Album"), "2014 - 2024 - Album")
 
+    def test_collapses_with_em_dash_separator(self):
+        self.assertEqual(collapse_duplicate_leading_year("2024 — 2024 — начало"), "2024 — начало")
+
 
 if __name__ == "__main__":
     unittest.main()
