@@ -1,4 +1,6 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useAppMotion } from "@/lib/motion";
 import { BulkFieldLabel } from "@/components/BulkFieldLabel";
 import { Panel } from "@/components/Panel";
 import { AppHeader } from "@/components/layout/AppHeader";
@@ -623,16 +625,18 @@ export function ImportAlbumsPage({ activePage, onNavigate }: ImportAlbumsPagePro
         onSave={handleSaveLibraryRoot}
       />
 
-      {bulkEditOpen ? (
-        <BulkEditModal
-          affectedAlbumCount={bulkAffectedAlbums.length}
-          albumName={visibleInspector.title}
-          draft={bulkDraft}
-          onDraftChange={setBulkDraft}
-          onApply={handleApplyBulkEdits}
-          onDiscard={handleDiscardBulkEdits}
-        />
-      ) : null}
+      <AnimatePresence>
+        {bulkEditOpen ? (
+          <BulkEditModal
+            affectedAlbumCount={bulkAffectedAlbums.length}
+            albumName={visibleInspector.title}
+            draft={bulkDraft}
+            onDraftChange={setBulkDraft}
+            onApply={handleApplyBulkEdits}
+            onDiscard={handleDiscardBulkEdits}
+          />
+        ) : null}
+      </AnimatePresence>
     </>
   );
 }
@@ -653,6 +657,7 @@ function BulkEditModal({
   onDiscard: () => void;
 }) {
   const { t } = useI18n();
+  const appMotion = useAppMotion();
   const changedFields = Object.entries(cleanAlbumOverride(draft));
   const helpTexts = {
     compilation: t("import.bulk.help.compilation"),
@@ -681,8 +686,23 @@ function BulkEditModal({
     coverHandlingMode: t("import.bulk.fields.coverHandlingMode"),
   } as const;
   return (
-    <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-      <Panel className="app-modal-panel flex h-[min(86vh,920px)] w-full max-w-[760px] min-h-0 flex-col p-0">
+    <motion.div
+      className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+      variants={appMotion.overlayVariants}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
+      transition={appMotion.overlayTransition}
+    >
+      <motion.div
+        className="flex h-[min(86vh,920px)] w-full max-w-[760px] min-h-0"
+        variants={appMotion.modalVariants}
+        initial="hidden"
+        animate="visible"
+        exit="hidden"
+        transition={appMotion.modalTransition}
+      >
+      <Panel className="app-modal-panel glass-edge flex h-full w-full min-h-0 flex-col p-0">
         <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
           <div>
             <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">{t("import.bulk.title")}</h2>
@@ -813,7 +833,8 @@ function BulkEditModal({
           </div>
         </div>
       </Panel>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

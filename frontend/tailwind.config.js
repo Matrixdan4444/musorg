@@ -50,6 +50,18 @@ var config = {
             gridTemplateColumns: {
                 import: "minmax(220px, 1.15fr) minmax(320px, 1.55fr) minmax(260px, 1fr)",
             },
+            transitionTimingFunction: {
+                apple: "cubic-bezier(0.22, 1, 0.36, 1)",
+            },
+            keyframes: {
+                "fade-in-up": {
+                    from: { opacity: "0", transform: "translateY(6px)" },
+                    to: { opacity: "1", transform: "translateY(0)" },
+                },
+            },
+            animation: {
+                "fade-in-up": "fade-in-up 0.22s cubic-bezier(0.22, 1, 0.36, 1) both",
+            },
         },
     },
     plugins: [animate],
