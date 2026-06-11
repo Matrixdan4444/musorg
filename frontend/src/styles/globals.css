@@ -5,10 +5,11 @@
 @layer base {
   :root {
     color-scheme: dark;
-    /* UI + logo font = Apple SF Pro Rounded (system, no embedding). To revert to
-       the classic stack, set:
+    /* Fonts (Apple system, no embedding): interface = SF Pro, logo = SF Pro Rounded.
+       To revert the UI to the classic stack, set:
        --font-ui: Inter, "SF Pro Display", "Segoe UI", sans-serif; */
-    --font-ui: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
+    --font-ui: -apple-system, system-ui, "SF Pro Text", "SF Pro Display", sans-serif;
+    --font-brand: ui-rounded, "SF Pro Rounded", -apple-system, system-ui, sans-serif;
     --background: 228 28% 8%;
     --foreground: 220 26% 95%;
     --panel: 228 23% 10%;
@@ -224,7 +225,7 @@
 
 @layer components {
   .font-brand {
-    font-family: var(--font-ui);
+    font-family: var(--font-brand);
   }
 
   .app-shell-grid {
