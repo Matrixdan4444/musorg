@@ -3,10 +3,10 @@ import {
   FolderCog,
   HeartPulse,
   PencilLine,
-  Waves,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useI18n } from "@/i18n/useI18n";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import type { AppPage, SidebarNavItem } from "@/types/layout";
 
 const icons = {
@@ -32,17 +32,10 @@ export function AppSidebar({ activePage, onNavigate, statusLabel }: AppSidebarPr
   return (
     <aside className="glass-panel hidden min-h-screen flex-col rounded-none border-b-0 border-l-0 border-t-0 bg-[linear-gradient(180deg,_hsl(var(--panel)/0.98),_hsl(var(--panel)/0.92))] px-5 py-6 lg:flex">
       <div className="flex items-center gap-3 px-1">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[hsl(var(--brand-bg))] text-[hsl(var(--brand-fg))]">
-          <Waves className="h-4.5 w-4.5" />
-        </div>
-        <div className="space-y-0.5">
-          <p className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">
-            Musorg
-          </p>
-          <p className="text-[12px] text-muted-foreground">
-            {t("sidebar.productTagline")}
-          </p>
-        </div>
+        <BrandLogo className="h-10 w-10" />
+        <p className="font-brand text-[18px] font-bold tracking-tight text-[hsl(var(--text-strong))]">
+          Musorg
+        </p>
       </div>
 
       <nav className="mt-8 flex flex-1 flex-col gap-1.5">

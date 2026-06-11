@@ -34,7 +34,10 @@ export function TrackTable({
     <Panel className="flex h-full min-h-0 flex-col p-0">
       <div className="flex items-center justify-between border-b border-border-soft/75 px-4 py-3">
         <div className="min-w-0">
-          <h2 className="overflow-hidden text-ellipsis whitespace-nowrap text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">
+          <h2
+            title={title}
+            className="line-clamp-2 text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]"
+          >
             {title}
           </h2>
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[12px] text-muted-foreground">
@@ -60,10 +63,10 @@ export function TrackTable({
             <tr className="border-b border-border-soft/75 text-left text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
               <th className="w-10 px-4 py-3 font-medium"> </th>
               <th className="w-12 px-2 py-3 font-medium">{t("tracks.number")}</th>
-              <th className="w-[42%] px-2 py-3 font-medium">{t("tracks.titleHeader")}</th>
-              <th className="w-[32%] px-2 py-3 font-medium">{t("tracks.artist")}</th>
-              <th className="w-16 px-2 py-3 font-medium text-right">{t("tracks.duration")}</th>
-              <th className="w-20 px-4 py-3 font-medium text-right">{t("tracks.issues")}</th>
+              <th className="w-[36%] px-2 py-3 font-medium">{t("tracks.titleHeader")}</th>
+              <th className="w-[26%] px-2 py-3 font-medium">{t("tracks.artist")}</th>
+              <th className="w-28 px-2 py-3 font-medium text-center whitespace-nowrap">{t("tracks.duration")}</th>
+              <th className="w-24 px-4 py-3 font-medium text-center whitespace-nowrap">{t("tracks.issues")}</th>
             </tr>
           </thead>
           <tbody>
@@ -84,9 +87,9 @@ export function TrackTable({
                 <td className="px-2 py-3 text-muted-foreground">{track.index}</td>
                 <td className="overflow-hidden text-ellipsis whitespace-nowrap px-2 py-3 text-[hsl(var(--text-strong))]">{track.title}</td>
                 <td className="overflow-hidden text-ellipsis whitespace-nowrap px-2 py-3">{track.artist}</td>
-                <td className="px-2 py-3 text-right text-[hsl(var(--text-strong))]">{track.duration}</td>
+                <td className="px-2 py-3 text-center text-[hsl(var(--text-strong))]">{track.duration}</td>
                 <td className="px-4 py-3">
-                  <div className="flex justify-end gap-1">
+                  <div className="flex justify-center gap-1">
                     {track.issues.length === 0 ? (
                       <span className="text-[12px] text-[hsl(var(--success-fg))]">{t("tracks.ok")}</span>
                     ) : (

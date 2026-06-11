@@ -44,7 +44,6 @@ export const ru: LocaleShape<typeof en> = {
     batch: "Массовое редактирование",
     issues: "Проблемы",
     settings: "Настройки",
-    productTagline: "Мастерская музыкальной библиотеки",
   },
   settings: {
     title: "Настройки",
@@ -100,7 +99,7 @@ export const ru: LocaleShape<typeof en> = {
     duplicateHandling: {
       eyebrow: "Дубликаты",
       title: "Обработка дубликатов",
-      subtitle: "Выберите, как Musorg должен вести себя с явно связанными дубликатами во время очистки.",
+      subtitle: "Выберите, как Musorg должен вести себя с явно связанными дубликатами во время обработки.",
       helpLabel: "Подсказка по дубликатам",
       help: "Связи между дубликатами по-прежнему показываются. Эта настройка меняет только рекомендации и то, куда Musorg направляет сильные и слабые копии.",
       options: {
@@ -141,7 +140,7 @@ export const ru: LocaleShape<typeof en> = {
     outputFormat: {
       eyebrow: "Выходная библиотека",
       title: "Формат выходных папок",
-      subtitle: "Выберите, как Musorg раскладывает очищенные альбомы в выходной библиотеке.",
+      subtitle: "Выберите, как Musorg раскладывает обработанные альбомы в выходной библиотеке.",
       simpleLabel: "Просто",
       advancedLabel: "Расширенное форматирование",
       advancedSubtitle: "Необязательные настройки для имен и редких случаев.",
@@ -168,7 +167,7 @@ export const ru: LocaleShape<typeof en> = {
       previewTitle: "Живой предпросмотр",
       previewSubtitle: "Легкий предпросмотр того, что запишет Musorg.",
       previewHelpLabel: "Подсказка по предпросмотру",
-      previewHelp: "Посмотрите готовое дерево папок до запуска очистки.",
+      previewHelp: "Посмотрите готовое дерево папок до запуска обработки.",
       presets: {
         artistYearAlbum: {
           title: "Артист / Год - Альбом",
@@ -228,7 +227,7 @@ export const ru: LocaleShape<typeof en> = {
     metadataPreservation: {
       eyebrow: "Запись тегов",
       title: "Сохранение метаданных",
-      subtitle: "Выберите, какие метаданные Musorg сохраняет при записи очищенных файлов.",
+      subtitle: "Выберите, какие метаданные Musorg сохраняет при записи обработанных файлов.",
       groups: {
         core: {
           title: "Основная музыкальная информация",
@@ -311,7 +310,7 @@ export const ru: LocaleShape<typeof en> = {
         embedArtwork: {
           label: "Встраивать обложку в файлы",
           helpLabel: "Подсказка по встраиванию обложки",
-          help: "Сохраняет обложку прямо внутри очищенных аудиофайлов.",
+          help: "Сохраняет обложку прямо внутри обработанных аудиофайлов.",
         },
         saveCoverJpg: {
           label: "Сохранять Cover.jpg",
@@ -358,15 +357,15 @@ export const ru: LocaleShape<typeof en> = {
       pickLibrary: "Не удалось открыть выбор папки.",
       pickOutput: "Не удалось открыть выбор выходной папки.",
       clearCache: "Не удалось очистить кэш.",
-      cleanLibrary: "Не удалось очистить библиотеку.",
+      cleanLibrary: "Не удалось привести библиотеку в порядок.",
     },
   },
   import: {
     title: "Импорт альбомов",
     subtitle: "Добавьте папку, а затем позвольте Musorg привести ее в порядок.",
     rescan: "Пересканировать",
-    clean: "Очистить мои альбомы",
-    cleaning: "Очистка...",
+    clean: "Привести в порядок",
+    cleaning: "Приводим в порядок...",
     reset: "Сброс",
     resetConfirm: "Отменить подготовленные изменения метаданных и сбросить это рабочее пространство?",
     chooseFolder: "Выбрать музыкальную папку",
@@ -439,7 +438,7 @@ export const ru: LocaleShape<typeof en> = {
         compilation: "Считать релиз сборником с несколькими основными артистами.",
         explicit: "Управляет отметкой откровенного контента для совместимых форматов тегов.",
         capitalizationMode: "Нормализует стиль регистра для названий, артистов и альбомов.",
-        normalizeFeaturingArtists: "Переносит featured-артистов в единый формат метаданных во время очистки.",
+        normalizeFeaturingArtists: "Переносит featured-артистов в единый формат метаданных во время обработки.",
         overwriteExistingTags: "Разрешает Musorg заменять существующие теги метаданных при обработке.",
         metadataProvider: "Принудительно использовать конкретный провайдер метаданных вместо автоматического выбора.",
         yearSource: "Выбрать источник метаданных, которому доверять при определении года релиза.",
@@ -467,7 +466,7 @@ export const ru: LocaleShape<typeof en> = {
     subtitle: "Спокойный срез того, насколько текущая библиотека выглядит организованной, полной и надёжной.",
     overallLabel: "Общее здоровье",
     coverageTitle: "Покрытие обработки",
-    coverageHint: "Какая часть текущей библиотеки уже очищена и организована.",
+    coverageHint: "Какая часть текущей библиотеки уже обработана и организована.",
     coverageProcessed: "Обработано",
     coverageRemaining: "Осталось",
     coveragePercent: "Покрытие",
@@ -519,7 +518,7 @@ export const ru: LocaleShape<typeof en> = {
       idle: "Без изменений",
       scanning: "Сканирование файлов",
       matching: "Сопоставление метаданных",
-      writing: "Подготовка очищенных треков",
+      writing: "Подготовка обработанных треков",
       completed: "Завершено",
       missing_output: "Выходные файлы удалены",
       failed: "Ошибка",
@@ -543,7 +542,7 @@ export const ru: LocaleShape<typeof en> = {
     proposedFix: "Предлагаемое исправление: {value}",
     affectedTracks: "Затронутые треки:",
     albumLevelIssue: "Проблема уровня альбома.",
-    proposedFixFallback: "Проверьте эту проблему при следующем запуске очистки.",
+    proposedFixFallback: "Проверьте эту проблему при следующем запуске обработки.",
     metadataDiff: "Изменения метаданных",
     noMetadataDiff: "Для этого альбома нет измененных полей метаданных.",
     whatChanged: "Что изменил Musorg",
@@ -572,7 +571,7 @@ export const ru: LocaleShape<typeof en> = {
     diagnostics: "Диагностика",
     noVariants: "Полезных подсказок по дубликатам или вариантам не найдено.",
     lowConfidenceTitle: "Совпадение с низкой уверенностью",
-    lowConfidenceMessage: "Musorg нашёл метаданные для этого релиза, но совпадение менее уверенное, чем обычно. Проверьте артиста, альбом, список треков и обложку, прежде чем полагаться на результат очистки.",
+    lowConfidenceMessage: "Musorg нашёл метаданные для этого релиза, но совпадение менее уверенное, чем обычно. Проверьте артиста, альбом, список треков и обложку, прежде чем полагаться на результат обработки.",
     variantSuggestion: {
       betterVersion: "Найдена лучшая версия",
       flacAvailable: "Доступен FLAC",
@@ -602,7 +601,7 @@ export const ru: LocaleShape<typeof en> = {
       duplicate: "Дубликаты",
       release_quality: "Качество релиза",
       suspicious_audio: "Подозрительное аудио",
-      collection_cleanup: "Очистка коллекции",
+      collection_cleanup: "Обработка коллекции",
       processing: "Обработка",
     },
     actionImpact: {
@@ -672,7 +671,7 @@ export const ru: LocaleShape<typeof en> = {
     },
     releaseTrackCount: "Треков: {count}",
     missingOutputTitle: "Обработанные файлы не найдены",
-    missingOutputMessage: "Musorg не нашёл очищенный выходной альбом. Рабочее пространство вернулось к исходной импортированной версии.",
+    missingOutputMessage: "Musorg не нашёл обработанный выходной альбом. Рабочее пространство вернулось к исходной импортированной версии.",
     beforeLabel: "Было",
     afterLabel: "Стало",
     confidence: {
@@ -749,7 +748,7 @@ export const ru: LocaleShape<typeof en> = {
       },
       album: {
         title: "Приведено к единому виду название альбома",
-        description: "Musorg очистил формат названия альбома и убрал лишний шум в имени релиза.",
+        description: "Musorg привёл в порядок формат названия альбома и убрал лишний шум в имени релиза.",
       },
       date: {
         title: "Уточнен год релиза",
@@ -757,7 +756,7 @@ export const ru: LocaleShape<typeof en> = {
       },
       genre: {
         title: "Обновлены жанры",
-        description: "Musorg автоматически нормализовал и очистил жанровые метаданные.",
+        description: "Musorg автоматически нормализовал и привёл в порядок жанровые метаданные.",
       },
       cover: {
         title: "Обновлена обложка",
@@ -777,7 +776,7 @@ export const ru: LocaleShape<typeof en> = {
       },
       organized_folder: {
         title: "Файлы альбома приведены в порядок",
-        description: "Musorg разложил очищенные файлы альбома по структуре выходной медиатеки.",
+        description: "Musorg разложил обработанные файлы альбома по структуре выходной медиатеки.",
       },
       manualOverride: {
         title: "Применено ручное изменение",
@@ -812,15 +811,15 @@ export const ru: LocaleShape<typeof en> = {
     },
     fixes: {
       unknown_artist: "Укажите артиста альбома и запустите обработку еще раз.",
-      missing_track_numbers: "Используйте очистку для перезаписи нормализованной нумерации треков.",
+      missing_track_numbers: "Используйте обработку для перезаписи нормализованной нумерации треков.",
       missing_release_date: "Укажите год релиза и запустите обработку еще раз.",
       album_artist_inconsistency: "Укажите единое имя артиста альбома для этого релиза.",
-      missing_cover: "Перед очисткой добавьте или сохраните более качественную обложку.",
+      missing_cover: "Перед обработкой добавьте или сохраните более качественную обложку.",
       "missing-metadata": "Проверьте метаданные треков и при необходимости примените ручные изменения.",
       "track-count-mismatch": "Проверьте релиз, потому что количество треков у провайдеров не совпало.",
       "provider-disagreement": "Сравните предложения провайдеров перед подтверждением финальных метаданных.",
-      "conflicting-release-year": "Подтвердите год релиза перед экспортом очищенного альбома.",
-      "low-quality-artwork": "Замените или сохраните более качественную обложку при следующей очистке.",
+      "conflicting-release-year": "Подтвердите год релиза перед экспортом обработанного альбома.",
+      "low-quality-artwork": "Замените или сохраните более качественную обложку при следующей обработке.",
       "mixed-primary-artists": "Проверьте кредиты артистов: возможно, в альбоме смешаны разные основные исполнители.",
       "runtime-mismatch": "Проверьте длительность альбома и порядок треков относительно выбранного релиза.",
     },
@@ -909,14 +908,14 @@ export const ru: LocaleShape<typeof en> = {
       deezerRejectedTrackCount: "Deezer отклонен: количество треков не совпало (локально {local}, Deezer {deezer}).",
       deezerPartialPayload: "Deezer вернул неполный релиз для {artist} — {album}, поэтому Musorg переключился на MusicBrainz.",
       musicbrainzMatched: "MusicBrainz подобрал метаданные для {artist} — {album} ({date})",
-      cleanedTracks: "Метаданные очищены для {count} треков",
+      cleanedTracks: "Метаданные обработаны для {count} треков",
       organizedAlbums: "Структура альбомов подготовлена: {count} альбомов",
       organizingAlbum: "Подготовка альбома {index}/{total}: {artist} — {album}",
-      savedTags: "Очищенные теги сохранены для {artist} — {album}",
+      savedTags: "Обработанные теги сохранены для {artist} — {album}",
       finishedOrganizing: "Подготовка завершена: {artist} — {album}",
       outputReady: "Результат готов: {artist} — {album}",
       albumCompleted: "Альбом завершен: {artist} — {album}",
-      savedTracks: "Сохранено {count} очищенных треков в выходную библиотеку",
+      savedTracks: "Сохранено {count} обработанных треков в выходную библиотеку",
       cleanupCompleted: "Обработка музыкальной библиотеки завершена",
     },
   },
