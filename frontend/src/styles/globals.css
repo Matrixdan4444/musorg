@@ -1,0 +1,432 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --background: 228 28% 8%;
+    --foreground: 220 26% 95%;
+    --panel: 228 23% 10%;
+    --card: 229 20% 12%;
+    --muted: 228 13% 17%;
+    --muted-foreground: 221 11% 62%;
+    --border: 226 18% 17%;
+    --border-soft: 224 18% 24%;
+    --border-strong: 224 22% 30%;
+    --text-strong: 220 26% 95%;
+    --text-base: 219 18% 83%;
+    --text-muted: 220 11% 63%;
+    --surface-soft: 228 20% 11%;
+    --surface-subtle: 228 18% 13%;
+    --surface-strong: 228 23% 18%;
+    --surface-contrast: 228 24% 9%;
+    --surface-overlay: 228 36% 8%;
+    --surface-tooltip: 228 34% 10%;
+    --surface-tooltip-border: 224 24% 29%;
+    --surface-field: 228 18% 13%;
+    --surface-field-hover: 228 18% 16%;
+    --success-bg: 148 35% 15%;
+    --success-fg: 145 58% 64%;
+    --success-border: 148 44% 32%;
+    --warning-bg: 31 40% 14%;
+    --warning-fg: 37 82% 70%;
+    --warning-border: 33 50% 35%;
+    --danger-bg: 352 44% 14%;
+    --danger-fg: 356 94% 74%;
+    --danger-border: 352 45% 35%;
+    --accent-hue: 260;
+    --accent-glow-hue: 220;
+    --accent-saturation-dark: 83%;
+    --accent-lightness-dark: 58%;
+    --accent-saturation-light: 74%;
+    --accent-lightness-light: 56%;
+    --accent-foreground: 240 100% 99%;
+    --accent: var(--accent-hue) var(--accent-saturation-dark) var(--accent-lightness-dark);
+    --ring: var(--accent);
+    --surface-selected: var(--accent-hue) 40% 17%;
+    --surface-selected-strong: var(--accent-hue) 56% 38%;
+    --brand-bg: var(--accent-hue) 65% 34%;
+    --brand-fg: var(--accent-hue) 100% 82%;
+    --info-bg: var(--accent-glow-hue) 40% 16%;
+    --info-fg: var(--accent-glow-hue) 100% 78%;
+    --info-border: var(--accent-glow-hue) 53% 42%;
+    --accent-glow-a: var(--accent);
+    --accent-glow-b: var(--accent-glow-hue) 86% 57%;
+    --shadow-panel: 0 24px 80px hsl(228 45% 3% / 0.36);
+    --shadow-card: 0 18px 48px hsl(228 45% 3% / 0.22);
+    --shadow-float: 0 24px 64px hsl(228 45% 3% / 0.35);
+    --shell-max-width: 1760px;
+  }
+
+  :root[data-theme-mode="dark"] {
+    color-scheme: dark;
+    --accent: var(--accent-hue) var(--accent-saturation-dark) var(--accent-lightness-dark);
+    --ring: var(--accent);
+    --surface-selected: var(--accent-hue) 40% 17%;
+    --surface-selected-strong: var(--accent-hue) 56% 38%;
+    --brand-bg: var(--accent-hue) 65% 34%;
+    --brand-fg: var(--accent-hue) 100% 82%;
+    --info-bg: var(--accent-glow-hue) 40% 16%;
+    --info-fg: var(--accent-glow-hue) 100% 78%;
+    --info-border: var(--accent-glow-hue) 53% 42%;
+    --accent-glow-a: var(--accent);
+    --accent-glow-b: var(--accent-glow-hue) 86% 57%;
+  }
+
+  :root[data-theme-mode="light"] {
+    color-scheme: light;
+    --background: 210 33% 98%;
+    --foreground: 228 24% 13%;
+    --panel: 0 0% 100%;
+    --card: 210 29% 96%;
+    --muted: 210 24% 92%;
+    --muted-foreground: 220 10% 42%;
+    --border: 214 22% 88%;
+    --border-soft: 214 18% 82%;
+    --border-strong: 218 21% 72%;
+    --text-strong: 228 24% 13%;
+    --text-base: 223 18% 28%;
+    --text-muted: 220 12% 45%;
+    --surface-soft: 0 0% 100%;
+    --surface-subtle: 210 30% 96%;
+    --surface-strong: 212 28% 92%;
+    --surface-contrast: 221 32% 94%;
+    --surface-overlay: 220 39% 18%;
+    --surface-tooltip: 224 32% 15%;
+    --surface-tooltip-border: 224 18% 30%;
+    --surface-field: 0 0% 100%;
+    --surface-field-hover: 210 31% 94%;
+    --success-bg: 145 52% 92%;
+    --success-fg: 148 61% 28%;
+    --success-border: 147 41% 63%;
+    --warning-bg: 39 84% 92%;
+    --warning-fg: 31 74% 30%;
+    --warning-border: 35 58% 60%;
+    --danger-bg: 354 74% 93%;
+    --danger-fg: 354 68% 34%;
+    --danger-border: 355 52% 67%;
+    --accent: var(--accent-hue) var(--accent-saturation-light) var(--accent-lightness-light);
+    --ring: var(--accent);
+    --surface-selected: var(--accent-hue) 100% 97%;
+    --surface-selected-strong: var(--accent-hue) 74% 56%;
+    --brand-bg: var(--accent-hue) 74% 93%;
+    --brand-fg: var(--accent-hue) 63% 46%;
+    --info-bg: var(--accent-glow-hue) 92% 94%;
+    --info-fg: var(--accent-glow-hue) 67% 34%;
+    --info-border: var(--accent-glow-hue) 58% 67%;
+    --accent-glow-a: var(--accent);
+    --accent-glow-b: var(--accent-glow-hue) 84% 54%;
+    --shadow-panel: 0 24px 72px hsl(220 32% 60% / 0.18);
+    --shadow-card: 0 14px 34px hsl(220 28% 60% / 0.14);
+    --shadow-float: 0 24px 64px hsl(220 28% 35% / 0.16);
+  }
+
+  :root[data-accent-color="violet"] {
+    --accent-hue: 260;
+    --accent-glow-hue: 220;
+    --accent-saturation-dark: 83%;
+    --accent-lightness-dark: 58%;
+    --accent-saturation-light: 74%;
+    --accent-lightness-light: 56%;
+  }
+
+  :root[data-accent-color="indigo"] {
+    --accent-hue: 246;
+    --accent-glow-hue: 226;
+    --accent-saturation-dark: 76%;
+    --accent-lightness-dark: 60%;
+    --accent-saturation-light: 70%;
+    --accent-lightness-light: 54%;
+  }
+
+  :root[data-accent-color="blue"] {
+    --accent-hue: 214;
+    --accent-glow-hue: 199;
+    --accent-saturation-dark: 84%;
+    --accent-lightness-dark: 58%;
+    --accent-saturation-light: 76%;
+    --accent-lightness-light: 54%;
+  }
+
+  :root[data-accent-color="teal"] {
+    --accent-hue: 182;
+    --accent-glow-hue: 196;
+    --accent-saturation-dark: 76%;
+    --accent-lightness-dark: 44%;
+    --accent-saturation-light: 68%;
+    --accent-lightness-light: 42%;
+  }
+
+  :root[data-accent-color="sky"] {
+    --accent-hue: 201;
+    --accent-glow-hue: 214;
+    --accent-saturation-dark: 88%;
+    --accent-lightness-dark: 62%;
+    --accent-saturation-light: 82%;
+    --accent-lightness-light: 58%;
+  }
+
+  :root[data-accent-color="emerald"] {
+    --accent-hue: 158;
+    --accent-glow-hue: 176;
+    --accent-saturation-dark: 66%;
+    --accent-lightness-dark: 46%;
+    --accent-saturation-light: 60%;
+    --accent-lightness-light: 42%;
+  }
+
+  :root[data-accent-color="amber"] {
+    --accent-hue: 38;
+    --accent-glow-hue: 24;
+    --accent-saturation-dark: 86%;
+    --accent-lightness-dark: 56%;
+    --accent-saturation-light: 78%;
+    --accent-lightness-light: 50%;
+  }
+
+  :root[data-accent-color="rose"] {
+    --accent-hue: 344;
+    --accent-glow-hue: 12;
+    --accent-saturation-dark: 78%;
+    --accent-lightness-dark: 60%;
+    --accent-saturation-light: 70%;
+    --accent-lightness-light: 56%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body,
+  #root {
+    @apply min-h-full bg-background text-foreground;
+  }
+
+  body {
+    font-family:
+      Inter,
+      "SF Pro Display",
+      "Segoe UI",
+      sans-serif;
+    background-image:
+      radial-gradient(circle at top, hsl(var(--accent-glow-a) / 0.16), transparent 24%),
+      radial-gradient(circle at bottom right, hsl(var(--accent-glow-b) / 0.12), transparent 18%);
+  }
+
+  ::selection {
+    background: hsl(var(--accent) / 0.26);
+    color: hsl(var(--accent-foreground));
+  }
+}
+
+@layer components {
+  .app-shell-grid {
+    @apply grid min-h-screen grid-cols-1 lg:grid-cols-[240px_minmax(0,1fr)];
+  }
+
+  .app-page-stack {
+    @apply relative min-h-screen;
+  }
+
+  .app-page-slot-active {
+    @apply relative z-10 min-h-screen;
+  }
+
+  .app-page-slot-inactive {
+    @apply pointer-events-none invisible absolute inset-0 z-0 min-h-screen overflow-hidden opacity-0 select-none;
+  }
+
+  .batch-input {
+    @apply w-full rounded-2xl border px-3 py-2 text-[13px] text-[hsl(var(--text-base))] outline-none transition;
+    border-color: hsl(var(--border-soft));
+    background: hsl(var(--surface-field));
+    caret-color: hsl(var(--text-strong));
+  }
+
+  .batch-input:focus,
+  .batch-input:focus-visible {
+    border-color: hsl(var(--ring) / 0.55);
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.18);
+  }
+
+  .batch-input::selection {
+    background: hsl(var(--accent) / 0.34);
+    color: hsl(var(--accent-foreground));
+  }
+
+  .glass-panel {
+    @apply border bg-panel/95 backdrop-blur-sm;
+    border-color: hsl(var(--border-soft) / 0.74);
+    box-shadow: var(--shadow-panel);
+  }
+
+  .surface-card {
+    @apply border bg-card/95;
+    border-color: hsl(var(--border-soft) / 0.8);
+    box-shadow: var(--shadow-card);
+  }
+
+  .app-control {
+    border: 1px solid hsl(var(--border-soft));
+    background: hsl(var(--surface-field));
+    color: hsl(var(--text-base));
+  }
+
+  .app-control:hover {
+    background: hsl(var(--surface-field-hover));
+  }
+
+  .app-control:focus,
+  .app-control:focus-visible {
+    outline: none;
+    border-color: hsl(var(--ring) / 0.55);
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.18);
+  }
+
+  .app-button-primary {
+    background: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+
+  .app-button-primary:hover {
+    filter: brightness(1.06);
+  }
+
+  .app-button-secondary {
+    border: 1px solid hsl(var(--border-soft));
+    background: hsl(var(--surface-field));
+    color: hsl(var(--text-base));
+  }
+
+  .app-button-secondary:hover {
+    background: hsl(var(--surface-field-hover));
+  }
+
+  .app-pill {
+    border: 1px solid hsl(var(--border-soft));
+    background: hsl(var(--surface-subtle));
+    color: hsl(var(--text-base));
+  }
+
+  .album-list-item {
+    content-visibility: auto;
+    contain: layout paint style;
+    contain-intrinsic-size: 86px;
+  }
+
+  .app-tonal-danger {
+    border: 1px solid hsl(var(--danger-border) / 0.7);
+    background: hsl(var(--danger-bg));
+    color: hsl(var(--danger-fg));
+  }
+
+  .app-tonal-warning {
+    border: 1px solid hsl(var(--warning-border) / 0.7);
+    background: hsl(var(--warning-bg));
+    color: hsl(var(--warning-fg));
+  }
+
+  .app-tonal-success {
+    border: 1px solid hsl(var(--success-border) / 0.7);
+    background: hsl(var(--success-bg));
+    color: hsl(var(--success-fg));
+  }
+
+  .app-tonal-info {
+    border: 1px solid hsl(var(--info-border) / 0.7);
+    background: hsl(var(--info-bg));
+    color: hsl(var(--info-fg));
+  }
+
+  .app-modal-overlay {
+    background: hsl(var(--surface-overlay) / 0.78);
+    backdrop-filter: blur(10px);
+  }
+
+  .app-modal-panel {
+    border: 1px solid hsl(var(--border-soft));
+    background: hsl(var(--panel) / 0.98);
+    box-shadow: var(--shadow-float);
+  }
+
+  .app-tooltip-surface {
+    border: 1px solid hsl(var(--surface-tooltip-border) / 0.72);
+    background: hsl(var(--surface-tooltip) / 0.94);
+    box-shadow: var(--shadow-float);
+  }
+
+  .app-startup-panel {
+    border: 1px solid hsl(var(--border-soft));
+    background: hsl(var(--panel) / 0.98);
+    box-shadow: var(--shadow-float);
+  }
+
+  .app-brand-glow {
+    background:
+      radial-gradient(circle at top, hsl(var(--accent) / 0.46), hsl(var(--accent) / 0.16));
+  }
+
+  .appearance-swatch-group {
+    @apply flex flex-wrap gap-3;
+  }
+
+  .appearance-swatch-option {
+    @apply inline-flex flex-col items-center gap-2 rounded-[20px] p-1.5 text-center transition;
+    min-width: 4.5rem;
+    color: hsl(var(--text-base));
+  }
+
+  .appearance-swatch-option:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+
+  .appearance-swatch-option:focus,
+  .appearance-swatch-option:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+  }
+
+  .appearance-swatch-option[data-selected="true"] {
+    color: hsl(var(--text-strong));
+  }
+
+  .appearance-swatch-circle {
+    @apply h-11 w-11 rounded-full border shadow-card;
+    border-color: hsl(var(--border-soft));
+    background: hsl(var(--surface-subtle));
+  }
+
+  .appearance-swatch-option[data-selected="true"] .appearance-swatch-circle {
+    border-color: hsl(var(--swatch-ring, var(--ring)) / 0.72);
+    box-shadow:
+      0 0 0 3px hsl(var(--swatch-ring, var(--ring)) / 0.18),
+      var(--shadow-card);
+  }
+
+  .appearance-swatch-label {
+    @apply text-[11px] font-medium;
+  }
+
+  .appearance-swatch-mode-light {
+    border-color: hsl(214 18% 82% / 0.95);
+    background:
+      radial-gradient(circle at 30% 30%, hsl(0 0% 100% / 0.98), transparent 48%),
+      linear-gradient(135deg, hsl(210 33% 98%), hsl(210 30% 96%));
+  }
+
+  .appearance-swatch-mode-dark {
+    border-color: hsl(224 18% 24% / 0.95);
+    background:
+      radial-gradient(circle at 30% 30%, hsl(228 23% 18% / 0.95), transparent 45%),
+      linear-gradient(135deg, hsl(228 28% 8%), hsl(228 20% 11%));
+  }
+
+  .appearance-swatch-accent {
+    background:
+      radial-gradient(circle at 30% 30%, hsl(var(--swatch-glow) / 0.6), transparent 46%),
+      linear-gradient(135deg, hsl(var(--swatch-fill)), hsl(var(--swatch-ring)));
+  }
+}
