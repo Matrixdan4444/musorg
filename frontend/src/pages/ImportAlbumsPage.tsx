@@ -448,7 +448,7 @@ export function ImportAlbumsPage({ activePage, onNavigate }: ImportAlbumsPagePro
     });
   }
 
-  const bulkAffectedAlbums = albums;
+  const bulkAffectedAlbums = albums.filter((album) => album.id === effectiveSelectedAlbumId);
   const workspaceGridColumns = "minmax(280px,0.95fr) minmax(0,1.55fr) minmax(300px,0.9fr)";
 
   function handleApplyBulkEdits() {
@@ -626,6 +626,7 @@ export function ImportAlbumsPage({ activePage, onNavigate }: ImportAlbumsPagePro
       {bulkEditOpen ? (
         <BulkEditModal
           affectedAlbumCount={bulkAffectedAlbums.length}
+          albumName={visibleInspector.title}
           draft={bulkDraft}
           onDraftChange={setBulkDraft}
           onApply={handleApplyBulkEdits}
@@ -638,12 +639,14 @@ export function ImportAlbumsPage({ activePage, onNavigate }: ImportAlbumsPagePro
 
 function BulkEditModal({
   affectedAlbumCount,
+  albumName,
   draft,
   onDraftChange,
   onApply,
   onDiscard,
 }: {
   affectedAlbumCount: number;
+  albumName: string;
   draft: BulkEditDraft;
   onDraftChange: (draft: BulkEditDraft) => void;
   onApply: () => void;
@@ -683,7 +686,7 @@ function BulkEditModal({
         <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
           <div>
             <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">{t("import.bulk.title")}</h2>
-            <p className="mt-1 text-[12px] text-muted-foreground">{t("import.bulk.subtitle", { count: affectedAlbumCount })}</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">{t("import.bulk.subtitle", { album: albumName })}</p>
           </div>
           <button
             className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-subtle/75 hover:text-[hsl(var(--text-strong))]"

@@ -12,6 +12,7 @@ from musorg.core.context import Context
 from musorg.core.run_report import RunReport
 from musorg.filesystem.naming import (
     build_output_preview_tree,
+    collapse_duplicate_leading_year,
     default_output_format_settings,
     format_output_destination,
 )
@@ -1054,6 +1055,26 @@ class OrganizeStageTests(unittest.TestCase):
                 for call in log_mock.call_args_list
             )
         )
+
+class CollapseDuplicateLeadingYearTests(unittest.TestCase):
+    def test_collapses_repeated_leading_year(self):
+        self.assertEqual(collapse_duplicate_leading_year("2024 - 2024 - начало"), "2024 - начало")
+
+    def test_collapses_repeated_year_without_remainder(self):
+        self.assertEqual(collapse_duplicate_leading_year("2024 - 2024"), "2024")
+
+    def test_keeps_single_leading_year(self):
+        self.assertEqual(collapse_duplicate_leading_year("2024 - начало"), "2024 - начало")
+
+    def test_keeps_year_named_album(self):
+        self.assertEqual(collapse_duplicate_leading_year("1984"), "1984")
+
+    def test_keeps_year_in_parentheses(self):
+        self.assertEqual(collapse_duplicate_leading_year("1989 (2014)"), "1989 (2014)")
+
+    def test_does_not_collapse_different_years(self):
+        self.assertEqual(collapse_duplicate_leading_year("2014 - 2024 - Album"), "2014 - 2024 - Album")
+
 
 if __name__ == "__main__":
     unittest.main()

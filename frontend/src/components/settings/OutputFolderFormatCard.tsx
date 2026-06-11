@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { AlertTriangle, ChevronDown, FileMusic, Folder, FolderOpen } from "lucide-react";
+import { AlertTriangle, ChevronDown, FileMusic, Folder, FolderOpen, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { FieldHelp } from "@/components/FieldHelp";
@@ -370,42 +370,68 @@ export function OutputFolderFormatCard({
                             className="overflow-hidden"
                           >
                             <div className="mt-4 space-y-4 border-t border-border-soft/75 pt-4">
-                              <div className="flex flex-wrap gap-2">
-                                {draft.customAlbumPattern.map((token, index) => (
-                                  <button
-                                    key={`${token}-${index}`}
-                                    className={cn(
-                                      "rounded-full border px-3 py-1.5 text-[12px] transition",
-                                      token === "folder_break"
-                                        ? "border-[hsl(var(--info-border)/0.44)] bg-info text-info-foreground"
-                                        : "border-border-soft/80 bg-surface-soft/90 text-[hsl(var(--text-strong))]",
-                                    )}
-                                    type="button"
-                                    onClick={() => void removeToken(index)}
-                                  >
-                                    {token === "folder_break" ? "/" : t(`settings.outputFormat.tokens.${token}` as never)}
-                                  </button>
-                                ))}
+                              <div className="space-y-2">
+                                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                                  {t("settings.outputFormat.customStructureLabel")}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {draft.customAlbumPattern.length === 0 ? (
+                                    <span className="text-[12px] text-muted-foreground">{t("settings.outputFormat.customEmpty")}</span>
+                                  ) : null}
+                                  {draft.customAlbumPattern.map((token, index) => (
+                                    <button
+                                      key={`${token}-${index}`}
+                                      className={cn(
+                                        "group inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] transition",
+                                        token === "folder_break"
+                                          ? "border-[hsl(var(--info-border)/0.44)] bg-info text-info-foreground"
+                                          : "border-border-soft/80 bg-surface-soft/90 text-[hsl(var(--text-strong))]",
+                                      )}
+                                      type="button"
+                                      onClick={() => void removeToken(index)}
+                                    >
+                                      {token === "folder_break" ? "/" : t(`settings.outputFormat.tokens.${token}` as never)}
+                                      <X className="h-3 w-3 opacity-50 transition group-hover:opacity-100" />
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
 
-                              <div className="flex flex-wrap gap-2">
-                                {tokenPalette.map((token) => (
+                              <div className="rounded-[14px] border border-border-soft/70 bg-surface-soft/70 px-3 py-2.5">
+                                <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                                  {t("settings.outputFormat.customPathPreviewLabel")}
+                                </p>
+                                <p className="mt-1 break-all font-mono text-[12px] text-[hsl(var(--text-strong))]">
+                                  {preview.albumRootLabel || "—"}
+                                </p>
+                              </div>
+
+                              <div className="space-y-2">
+                                <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+                                  {t("settings.outputFormat.customAddLabel")}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {tokenPalette.map((token) => (
+                                    <button
+                                      key={token}
+                                      className="rounded-full border border-border-soft/80 bg-surface-soft/90 px-3 py-1.5 text-[12px] text-[hsl(var(--text-base))] transition hover:bg-surface-subtle"
+                                      type="button"
+                                      onClick={() => void appendToken(token)}
+                                    >
+                                      {t(`settings.outputFormat.tokens.${token}` as never)}
+                                    </button>
+                                  ))}
                                   <button
-                                    key={token}
-                                    className="rounded-full border border-border-soft/80 bg-surface-soft/90 px-3 py-1.5 text-[12px] text-[hsl(var(--text-base))] transition hover:bg-surface-subtle"
+                                    className="rounded-full border border-[hsl(var(--info-border)/0.44)] bg-info px-3 py-1.5 text-[12px] text-info-foreground transition hover:brightness-110"
                                     type="button"
-                                    onClick={() => void appendToken(token)}
+                                    onClick={() => void addFolderBreak()}
                                   >
-                                    {t(`settings.outputFormat.tokens.${token}` as never)}
+                                    {t("settings.outputFormat.addFolderBreak")}
                                   </button>
-                                ))}
-                                <button
-                                  className="rounded-full border border-[hsl(var(--info-border)/0.44)] bg-info px-3 py-1.5 text-[12px] text-info-foreground transition hover:brightness-110"
-                                  type="button"
-                                  onClick={() => void addFolderBreak()}
-                                >
-                                  {t("settings.outputFormat.addFolderBreak")}
-                                </button>
+                                </div>
+                                <p className="text-[11px] text-muted-foreground">
+                                  {t("settings.outputFormat.customHint")}
+                                </p>
                               </div>
                             </div>
                           </motion.div>

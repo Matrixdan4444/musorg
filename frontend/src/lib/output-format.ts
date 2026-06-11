@@ -158,6 +158,16 @@ export function previewAlbumFromWorkspace(input: {
   };
 }
 
+const DUPLICATE_LEADING_YEAR_RE = /^(\d{4})(\s*[-–_.]\s*)\1((?:[\s\-–_.].*)?)$/;
+
+function collapseDuplicateLeadingYear(segment: string): string {
+  const match = DUPLICATE_LEADING_YEAR_RE.exec(segment.trim());
+  if (!match) {
+    return segment;
+  }
+  return `${match[1]}${match[3] ?? ""}`.trim();
+}
+
 function albumFolderSegments(album: OutputPreviewAlbum, settings: OutputFormatSettings): string[] {
   const artist = album.albumArtist || album.artist || "Unknown Artist";
   const year = album.year && album.year !== "Unknown" ? album.year : "0000";
@@ -173,7 +183,7 @@ function albumFolderSegments(album: OutputPreviewAlbum, settings: OutputFormatSe
     case "custom":
       return customAlbumSegments(album, settings.customAlbumPattern);
     default:
-      return [artist, `${year} - ${album.title}`];
+      return [artist, collapseDuplicateLeadingYear(`${year} - ${album.title}`)];
   }
 }
 
@@ -191,7 +201,7 @@ function customAlbumSegments(album: OutputPreviewAlbum, pattern: OutputFormatTok
       segments[segments.length - 1]?.push(value);
     }
   }
-  return segments.map((segment) => segment.join(" - ")).filter(Boolean);
+  return segments.map((segment) => collapseDuplicateLeadingYear(segment.join(" - "))).filter(Boolean);
 }
 
 function customTokenValue(album: OutputPreviewAlbum, token: OutputFormatToken): string {
