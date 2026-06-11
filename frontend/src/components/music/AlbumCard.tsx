@@ -18,7 +18,7 @@ function AlbumCardView({ album }: AlbumCardProps) {
   return (
     <article
       className={cn(
-        "group grid grid-cols-[60px_minmax(0,1fr)] gap-3 rounded-2xl border border-border-soft/75 bg-surface-soft px-3 py-3 transition-colors hover:bg-surface-subtle",
+        "group grid grid-cols-[60px_minmax(0,1fr)] gap-3 rounded-2xl border border-border-soft/75 bg-surface-soft px-3 py-3 transition-[transform,background-color,box-shadow,border-color] duration-150 ease-apple hover:-translate-y-px hover:bg-surface-subtle hover:shadow-card",
         album.selected && "border-[hsl(var(--info-border)/0.72)] bg-surface-selected/90",
         processingTone.container,
       )}

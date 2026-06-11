@@ -1,7 +1,9 @@
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FolderOutput, FolderSearch, X } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { useI18n } from "@/i18n/useI18n";
+import { useAppMotion } from "@/lib/motion";
 import { cn } from "@/lib/cn";
 
 interface LibraryPickerDialogProps {
@@ -34,6 +36,7 @@ export function LibraryPickerDialog({
   onSave,
 }: LibraryPickerDialogProps) {
   const { t } = useI18n();
+  const appMotion = useAppMotion();
   const [draftLibraryPath, setDraftLibraryPath] = useState(libraryPath);
   const [draftOutputPath, setDraftOutputPath] = useState(outputPath);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -94,8 +97,21 @@ export function LibraryPickerDialog({
   }
 
   return (
-    <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-      <Panel className="app-modal-panel w-full max-w-[840px] p-0">
+    <motion.div
+      className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+      variants={appMotion.overlayVariants}
+      initial="hidden"
+      animate="visible"
+      transition={appMotion.overlayTransition}
+    >
+      <motion.div
+        className="w-full max-w-[840px]"
+        variants={appMotion.modalVariants}
+        initial="hidden"
+        animate="visible"
+        transition={appMotion.modalTransition}
+      >
+      <Panel className="app-modal-panel glass-edge w-full p-0">
         <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
           <div>
             <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">
@@ -190,6 +206,7 @@ export function LibraryPickerDialog({
           </div>
         </div>
       </Panel>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

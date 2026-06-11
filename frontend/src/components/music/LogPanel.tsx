@@ -1,7 +1,9 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { Panel } from "@/components/Panel";
 import { useLogsStream } from "@/hooks/useLogsStream";
 import { useI18n } from "@/i18n/useI18n";
+import { useAppMotion } from "@/lib/motion";
 import { translateLogMessage, translateLogSource } from "@/lib/ui-copy";
 import type { LogEntry, LogStep } from "@/types/music";
 
@@ -16,6 +18,7 @@ interface LogPanelProps {
 
 export function LogPanel({ developerMode, open, onOpen, onClose }: LogPanelProps) {
   const { t } = useI18n();
+  const appMotion = useAppMotion();
   const { logs, steps, status, sessionState, paused, activeRunId, setPaused, clearVisible } = useLogsStream(developerMode, null);
   const [severityFilter, setSeverityFilter] = useState("all");
   const [sourceFilter, setSourceFilter] = useState("all");
@@ -123,9 +126,25 @@ export function LogPanel({ developerMode, open, onOpen, onClose }: LogPanelProps
         </div>
       </Panel>
 
+      <AnimatePresence>
       {open ? (
-        <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-          <Panel className="app-modal-panel flex h-[min(80vh,760px)] w-full max-w-[980px] min-h-0 flex-col overflow-hidden p-0">
+        <motion.div
+          className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6"
+          variants={appMotion.overlayVariants}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          transition={appMotion.overlayTransition}
+        >
+          <motion.div
+            className="flex h-[min(80vh,760px)] w-full max-w-[980px] min-h-0"
+            variants={appMotion.modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={appMotion.modalTransition}
+          >
+          <Panel className="app-modal-panel glass-edge flex h-full w-full min-h-0 flex-col overflow-hidden p-0">
             <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
               <div>
                 <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">
@@ -180,8 +199,10 @@ export function LogPanel({ developerMode, open, onOpen, onClose }: LogPanelProps
               <VirtualizedLogList logs={filteredLogs} emptyLabel={t("logs.noLogs")} />
             </div>
           </Panel>
-        </div>
+          </motion.div>
+        </motion.div>
       ) : null}
+      </AnimatePresence>
     </>
   );
 }
