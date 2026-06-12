@@ -37,6 +37,7 @@ from musorg.api.services.library import (
     get_album_detail_payload_for_root,
     get_related_releases_payload,
     list_albums_for_root,
+    resolve_album_runtime_state,
 )
 from musorg.api.services.settings import get_library_settings_state
 from musorg.core.metadata_intelligence import build_metadata_intelligence, metadata_snapshot
@@ -76,7 +77,7 @@ def get_batch_edit_album_detail(album_id: str) -> BatchEditAlbumDetailResponseSc
         album_id,
         settings_state.libraryRoot or None,
         include_metadata_intelligence=True,
-        resolve_runtime_output=False,
+        resolve_runtime_output=True,
     )
     related = get_related_releases_payload(album_id)
     actions = get_album_actions_payload(album_id)
@@ -742,6 +743,13 @@ def _resolve_album_path(album_id: str) -> str:
     folder = Path(_decode_path(album_id)).expanduser().resolve()
     if not folder.exists() or not folder.is_dir() or not folder.is_relative_to(root):
         raise HTTPException(status_code=404, detail="Album not found")
+    # Once an album is tidied up, batch editing should operate on the processed
+    # output (until the user deletes it). The resolver returns the output folder
+    # for completed albums and falls back to the source otherwise.
+    resolution = resolve_album_runtime_state(str(root), str(folder))
+    resolved = Path(resolution.resolved_folder_path).expanduser().resolve()
+    if resolution.resolved_mode == "output" and resolved.exists() and resolved.is_dir():
+        return str(resolved)
     return str(folder)
 
 

@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import base64
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+from musorg.api.services.batch_edit import _resolve_album_path
+from musorg.api.services.library import AlbumRuntimeStateResolution
 
 from musorg.api.schemas.music import (
     BatchEditAlbumDraftSchema,
@@ -24,6 +29,36 @@ from musorg.api.services.batch_edit import (
 
 
 class BatchEditServiceTests(unittest.TestCase):
+    def test_resolve_album_path_uses_output_for_completed_albums(self):
+        with tempfile.TemporaryDirectory() as root_dir:
+            root = Path(root_dir).resolve()
+            source = root / "Artist" / "Album"
+            output = root / "Artist" / "Album_organized"
+            source.mkdir(parents=True)
+            output.mkdir(parents=True)
+            album_id = base64.urlsafe_b64encode(str(source).encode()).decode().rstrip("=")
+            settings_state = LibrarySettingsResponse(
+                libraryRoot=str(root),
+                outputRoot=str(root),
+                developerMode=False,
+                language="en",
+                isConfigured=True,
+                isAvailable=True,
+                source="settings",
+                pickerAvailable=False,
+            )
+            resolution = AlbumRuntimeStateResolution(
+                processing_state="completed",
+                output_path=str(output),
+                resolved_folder_path=str(output),
+                resolved_mode="output",
+            )
+            with (
+                patch("musorg.api.services.batch_edit.get_library_settings_state", return_value=settings_state),
+                patch("musorg.api.services.batch_edit.resolve_album_runtime_state", return_value=resolution),
+            ):
+                self.assertEqual(_resolve_album_path(album_id), str(output))
+
     def test_list_batch_edit_albums_resolves_runtime_output_for_status(self):
         settings_state = LibrarySettingsResponse(
             libraryRoot="/music/source",
@@ -48,7 +83,7 @@ class BatchEditServiceTests(unittest.TestCase):
             resolve_runtime_output=True,
         )
 
-    def test_get_batch_edit_album_detail_reads_source_library_only(self):
+    def test_get_batch_edit_album_detail_resolves_runtime_output(self):
         settings_state = LibrarySettingsResponse(
             libraryRoot="/music/source",
             outputRoot="/music/output",
@@ -76,7 +111,7 @@ class BatchEditServiceTests(unittest.TestCase):
             "album-123",
             "/music/source",
             include_metadata_intelligence=True,
-            resolve_runtime_output=False,
+            resolve_runtime_output=True,
         )
 
     @patch("musorg.api.services.batch_edit.read_tags")
