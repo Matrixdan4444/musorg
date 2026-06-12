@@ -241,7 +241,7 @@
   }
 
   .app-page-slot-active .app-page-content {
-    animation: page-enter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: page-enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .app-page-slot-inactive {
