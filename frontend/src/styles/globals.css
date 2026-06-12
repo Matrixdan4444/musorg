@@ -447,9 +447,10 @@
   }
 
   .appearance-swatch-option[data-selected="true"] .appearance-swatch-circle {
-    border-color: hsl(var(--swatch-ring, var(--ring)) / 0.72);
+    border-color: hsl(var(--swatch-ring, var(--ring)) / 0.5);
     box-shadow:
-      0 0 0 3px hsl(var(--swatch-ring, var(--ring)) / 0.18),
+      0 0 0 2px hsl(var(--surface-subtle)),
+      0 0 0 4px hsl(var(--swatch-ring, var(--ring)) / 0.95),
       var(--shadow-card);
   }
 
