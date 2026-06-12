@@ -147,7 +147,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
   );
   const artworkDirty = artworkDraft.mode !== "keep";
   const releaseDirty = releaseReplacementDraft !== null;
-  const hasUnsavedChanges = Boolean(selectedDetail) && (
+  const hasUnsavedChanges = Boolean(selectedDetail) && selectedDetail?.album.id === selectedAlbumId && (
     dirtyAlbumFields.size > 0
     || dirtyTrackIds.size > 0
     || artworkDirty
