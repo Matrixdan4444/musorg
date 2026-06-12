@@ -44,7 +44,7 @@ export function AppHeader({
   }[libraryStatusTone];
 
   return (
-    <header className="glass-chrome glass-edge space-y-4 border-b border-border-soft/75 px-4 py-5 lg:px-8">
+    <header className="glass-chrome space-y-4 border-b border-border-soft/75 px-4 py-5 lg:px-8">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div className="space-y-1">
           <h1 className="text-[17px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">

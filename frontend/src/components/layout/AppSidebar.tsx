@@ -32,7 +32,7 @@ export function AppSidebar({ activePage, onNavigate, statusLabel }: AppSidebarPr
   ];
 
   return (
-    <aside className="glass-panel glass-edge hidden min-h-screen flex-col rounded-none border-b-0 border-l-0 border-t-0 bg-[linear-gradient(180deg,_hsl(var(--panel)/0.98),_hsl(var(--panel)/0.94))] px-5 py-6 lg:flex">
+    <aside className="glass-panel hidden min-h-screen flex-col rounded-none border-b-0 border-l-0 border-t-0 bg-[linear-gradient(180deg,_hsl(var(--panel)/0.98),_hsl(var(--panel)/0.94))] px-5 py-6 lg:flex">
       <div className="flex items-center gap-3 px-1">
         <BrandLogo className="h-10 w-10" />
         <p className="font-brand text-[18px] font-bold tracking-tight text-[hsl(var(--text-strong))]">
@@ -41,16 +41,13 @@ export function AppSidebar({ activePage, onNavigate, statusLabel }: AppSidebarPr
       </div>
 
       <nav className="mt-8 flex flex-1 flex-col gap-1.5">
-        {navItems.map((item, index) => {
+        {navItems.map((item) => {
           const Icon = icons[item.id];
           const active = item.id === activePage;
 
           return (
             <motion.button
               key={item.id}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2, delay: index * 0.04 }}
               whileTap={appMotion.tap}
               className={cn(
                 "group relative z-[1] flex items-center gap-3 overflow-hidden rounded-2xl border px-3 py-2.5 text-left transition-[border-color,background-color,color,transform]",
