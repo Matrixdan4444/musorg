@@ -32,7 +32,7 @@ export function AppSidebar({ activePage, onNavigate, statusLabel }: AppSidebarPr
   ];
 
   return (
-    <aside className="glass-panel glass-edge hidden min-h-screen flex-col rounded-none border-b-0 border-l-0 border-t-0 bg-[linear-gradient(180deg,_hsl(var(--panel)/0.86),_hsl(var(--panel)/0.72))] px-5 py-6 lg:flex">
+    <aside className="glass-panel glass-edge hidden min-h-screen flex-col rounded-none border-b-0 border-l-0 border-t-0 bg-[linear-gradient(180deg,_hsl(var(--panel)/0.98),_hsl(var(--panel)/0.94))] px-5 py-6 lg:flex">
       <div className="flex items-center gap-3 px-1">
         <BrandLogo className="h-10 w-10" />
         <p className="font-brand text-[18px] font-bold tracking-tight text-[hsl(var(--text-strong))]">
