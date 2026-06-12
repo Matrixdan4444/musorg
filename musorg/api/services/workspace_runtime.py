@@ -217,7 +217,6 @@ def runtime_display_title(track: dict) -> str:
         prefix = f"{year} - "
         while album.startswith(prefix):
             album = album[len(prefix):]
-        return f"{year} - {album}"
     return album
 
 

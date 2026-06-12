@@ -221,6 +221,7 @@ export function AlbumInspector({
   return (
     <>
       <Panel className="flex h-full min-h-0 flex-col p-4">
+        <div className="flex shrink-0 flex-col">
         <button
           className="ml-auto inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-subtle/75 hover:text-[hsl(var(--text-strong))]"
           type="button"
@@ -349,6 +350,7 @@ export function AlbumInspector({
             <VariantsSection data={relatedReleases} loading={relatedReleasesLoading} />
           </div>
         ) : null}
+        </div>
 
         <div className="mt-5 flex min-h-0 flex-1 flex-col rounded-[22px] border border-border-soft/75 bg-surface-subtle/85 p-4">
           <p className="text-[12px] font-medium text-[hsl(var(--text-strong))]">{t("inspector.issues")}</p>
@@ -437,7 +439,7 @@ function DiagnosticsSection({
 }) {
   const { t } = useI18n();
   return (
-    <section className="min-w-0 overflow-visible rounded-[20px] border border-border-soft/75 bg-surface-subtle/85 px-4 py-4">
+    <section className="mt-5 min-w-0 overflow-visible rounded-[20px] border border-border-soft/75 bg-surface-subtle/85 px-4 py-4">
       <p className="text-[12px] font-medium text-[hsl(var(--text-strong))]">{t("inspector.diagnostics")}</p>
       <div className="mt-3 space-y-3">
         <IntelligenceSummary
