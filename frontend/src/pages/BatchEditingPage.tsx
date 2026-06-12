@@ -213,7 +213,16 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
   }
 
   function handleSelectAlbum(albumId: string) {
+    if (albumId === selectedAlbumId) {
+      return;
+    }
     guardNavigation(() => {
+      // Clear drafts up-front so the new card never briefly diffs against the
+      // previous album's draft (which flashed a false "Metadata Modified").
+      setAlbumDraft(null);
+      setTrackDraftsById({});
+      setArtworkDraft(emptyArtworkDraft);
+      setReleaseReplacementDraft(null);
       setSelectedAlbumId(albumId);
     });
   }
