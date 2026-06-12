@@ -240,6 +240,10 @@
     @apply relative z-10 min-h-screen;
   }
 
+  .app-page-slot-active .app-page-content {
+    animation: page-enter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
   .app-page-slot-inactive {
     @apply pointer-events-none invisible absolute inset-0 z-0 min-h-screen overflow-hidden opacity-0 select-none;
   }
@@ -471,6 +475,17 @@
     background:
       radial-gradient(circle at 30% 30%, hsl(var(--swatch-glow) / 0.6), transparent 46%),
       linear-gradient(135deg, hsl(var(--swatch-fill)), hsl(var(--swatch-ring)));
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.995);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
