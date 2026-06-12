@@ -63,7 +63,10 @@ def list_batch_edit_albums():
     return list_albums_for_root(
         settings_state.libraryRoot,
         include_metadata_intelligence=True,
-        resolve_runtime_output=False,
+        # Resolve runtime output so already-tidied albums show as "completed"
+        # here too (consistent with Import); editing still targets the source
+        # files because the album id encodes the source folder.
+        resolve_runtime_output=True,
     )
 
 
