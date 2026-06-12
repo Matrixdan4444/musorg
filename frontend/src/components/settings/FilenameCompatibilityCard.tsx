@@ -80,7 +80,7 @@ export function FilenameCompatibilityCard({ value, saving, onChange }: FilenameC
               className={cn(
                 "rounded-[22px] border px-4 py-4 text-left transition",
                 selected
-                  ? "border-[hsl(var(--info-border)/0.48)] bg-surface-selected/90 shadow-card"
+                  ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90 shadow-card"
                   : "border-border-soft/80 bg-surface-subtle/80 hover:border-border-strong/80 hover:bg-surface-subtle",
               )}
               type="button"

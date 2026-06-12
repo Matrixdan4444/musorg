@@ -284,7 +284,7 @@ function ToggleRow({
         className={cn(
           "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border transition",
           checked
-            ? "border-[hsl(var(--info-border)/0.5)] bg-[linear-gradient(180deg,hsl(var(--accent)),hsl(var(--accent)/0.88))]"
+            ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-[linear-gradient(180deg,hsl(var(--accent)),hsl(var(--accent)/0.88))]"
             : "border-border-soft/80 bg-surface-strong/80",
           disabled && "cursor-not-allowed",
         )}

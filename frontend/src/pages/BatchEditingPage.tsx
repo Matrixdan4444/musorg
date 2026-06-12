@@ -472,7 +472,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                 key={album.id}
                 className={cn(
                   "grid min-h-[92px] w-full grid-cols-[24px_56px_minmax(0,1fr)] gap-3 rounded-2xl border px-3 py-3 text-left transition",
-                  album.id === selectedAlbumId ? "border-[hsl(var(--info-border)/0.62)] bg-surface-selected/90" : "border-border-soft/75 bg-surface-soft hover:bg-surface-subtle",
+                  album.id === selectedAlbumId ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90" : "border-border-soft/75 bg-surface-soft hover:bg-surface-subtle",
                 )}
                 type="button"
                 onClick={() => handleSelectAlbum(album.id)}
