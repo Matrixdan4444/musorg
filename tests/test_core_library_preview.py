@@ -98,6 +98,31 @@ class CoreLibraryPreviewTests(unittest.TestCase):
 
     @patch("musorg.core.library_preview.load_album_cover_bytes")
     @patch("musorg.core.library_preview.read_tags")
+    def test_scan_album_previews_reads_year_from_full_iso_date_tag(self, read_tags_mock, cover_mock):
+        read_tags_mock.return_value = {
+            "title": "My Own Summer",
+            "tracknumber": "01",
+            "duration_seconds": 215.0,
+            "has_tracknumber_tag": True,
+            "artist": "Deftones",
+            "albumartist": "Deftones",
+            "album": "Around the Fur",
+            "date": "1997-10-28",
+        }
+        cover_mock.return_value = b"cover"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            album_dir = f"{temp_dir}/Deftones/Around the Fur"
+            self._touch_flac(f"{album_dir}/01 - track.flac")
+
+            previews = scan_album_previews(temp_dir)
+
+        self.assertEqual(len(previews), 1)
+        self.assertEqual(previews[0].release_year, "1997")
+        self.assertNotIn("missing_release_date", previews[0].issues)
+
+    @patch("musorg.core.library_preview.load_album_cover_bytes")
+    @patch("musorg.core.library_preview.read_tags")
     def test_scan_album_previews_prefers_tag_artist_over_unknown_folder_artist(self, read_tags_mock, cover_mock):
         read_tags_mock.return_value = {
             "title": "Track",
