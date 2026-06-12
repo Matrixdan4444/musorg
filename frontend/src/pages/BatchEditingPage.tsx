@@ -501,9 +501,10 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                     <p className="line-clamp-2 break-words text-[12px] leading-5 text-muted-foreground">{album.artist} • {album.year}</p>
                   </div>
                   <div className="flex min-w-0 flex-wrap gap-1.5">
-                    {album.lowConfidence ? <IssueBadge compact severity="warning" issue={{ id: "low-confidence", label: "Low Confidence", severity: "warning" }} /> : null}
-                    {!album.coverUrl ? <IssueBadge compact severity="warning" issue={{ id: "missing-art", label: "Missing Artwork", severity: "warning" }} /> : null}
-                    {selectedAlbumId === album.id && hasUnsavedChanges ? <IssueBadge compact severity="neutral" value="Metadata Modified" /> : null}
+                    {album.processingState === "completed" ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="success" value="Completed" /> : null}
+                    {album.lowConfidence ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "low-confidence", label: "Low Confidence", severity: "warning" }} /> : null}
+                    {!album.coverUrl ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "missing-art", label: "Missing Artwork", severity: "warning" }} /> : null}
+                    {selectedAlbumId === album.id && hasUnsavedChanges ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="neutral" value="Metadata Modified" /> : null}
                   </div>
                 </div>
               </button>

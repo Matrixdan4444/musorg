@@ -24,7 +24,7 @@ from musorg.api.services.batch_edit import (
 
 
 class BatchEditServiceTests(unittest.TestCase):
-    def test_list_batch_edit_albums_reads_source_library_only(self):
+    def test_list_batch_edit_albums_resolves_runtime_output_for_status(self):
         settings_state = LibrarySettingsResponse(
             libraryRoot="/music/source",
             outputRoot="/music/output",
@@ -45,7 +45,7 @@ class BatchEditServiceTests(unittest.TestCase):
         list_mock.assert_called_once_with(
             "/music/source",
             include_metadata_intelligence=True,
-            resolve_runtime_output=False,
+            resolve_runtime_output=True,
         )
 
     def test_get_batch_edit_album_detail_reads_source_library_only(self):
