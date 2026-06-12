@@ -365,9 +365,9 @@ def _release_year_from_tags(tags: dict) -> str:
         return release_date_iso[:4]
 
     date = str(tags.get("date") or "").strip()
-    if re.match(r"^\d{4}$", date):
-        return date
-    if re.match(r"^\d{2}-\d{2}-\d{4}$", date):
+    if re.match(r"^\d{4}", date):  # YYYY, YYYY-MM, YYYY-MM-DD
+        return date[:4]
+    if re.match(r"^\d{2}-\d{2}-\d{4}$", date):  # DD-MM-YYYY
         return date[-4:]
     return ""
 
@@ -375,7 +375,7 @@ def _release_year_from_tags(tags: dict) -> str:
 def _has_normalized_release_date(tags: dict) -> bool:
     release_date_iso = str(tags.get("release_date_iso") or "").strip()
     date = str(tags.get("date") or "").strip()
-    return bool(re.match(r"^\d{4}-\d{2}-\d{2}$", release_date_iso) or re.match(r"^\d{4}$", date))
+    return bool(re.match(r"^\d{4}-\d{2}-\d{2}$", release_date_iso) or re.match(r"^\d{4}", date))
 
 
 def _album_has_cover(folder: Path) -> bool:
