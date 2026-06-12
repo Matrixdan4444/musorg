@@ -346,7 +346,7 @@ def _serialize_preview(
 ) -> AlbumListItemSchema:
     album_id = _encode_album_id(preview.folder_path)
     resolved_preview = _resolved_preview_for_list(preview, runtime_resolution, root_path)
-    year = _preferred_year(_year_from_title(resolved_preview.album_title))
+    year = _preferred_year(resolved_preview.release_year or _year_from_title(resolved_preview.album_title))
     issue_counts = _album_status_counts(resolved_preview.issues, metadata_intelligence=metadata_intelligence)
     return AlbumListItemSchema(
         id=album_id,
@@ -517,12 +517,13 @@ def _resolved_preview_for_list(
     except Exception:
         return preview
     return AlbumPreview(
-        album_title=f"{detail.release_year} - {detail.album_title}" if _clean_text(detail.release_year) else detail.album_title,
+        album_title=detail.album_title,
         artist_name=detail.artist_name,
         track_count=len(detail.tracks),
         folder_path=preview.folder_path,
         status=detail.status,
         issues=detail.issues,
+        release_year=detail.release_year,
     )
 
 
@@ -532,8 +533,6 @@ def _display_title(title: str | None, year: str) -> str:
         prefix = f"{year} - "
         while normalized.startswith(prefix):
             normalized = normalized[len(prefix) :]
-    if year != "Unknown":
-        return f"{year} - {normalized}"
     return normalized
 
 

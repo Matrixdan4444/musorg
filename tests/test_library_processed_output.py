@@ -56,7 +56,8 @@ class LibraryProcessedOutputTests(unittest.TestCase):
             album = payload.albums[0]
             self.assertEqual(album.processingState, "completed")
             self.assertEqual(album.outputPath, str(output_dir.resolve()))
-            self.assertEqual(album.title, "2024 - Album Organized")
+            self.assertEqual(album.title, "Album Organized")
+            self.assertEqual(album.year, "2024")
             self.assertEqual(album.artist, "Artist Clean")
             self.assertEqual(album.status, "ready")
             self.assertEqual(album.issueCounts.warning, 0)
@@ -114,7 +115,7 @@ class LibraryProcessedOutputTests(unittest.TestCase):
 
             self.assertIsNone(payload.album.processingState)
             self.assertIsNone(payload.album.outputPath)
-            self.assertEqual(payload.album.title, "2024 - Album")
+            self.assertEqual(payload.album.title, "Album")
 
     def test_album_detail_uses_processed_output_metadata_when_output_is_valid(self):
         with TemporaryDirectory() as root_dir:
@@ -144,7 +145,7 @@ class LibraryProcessedOutputTests(unittest.TestCase):
 
             self.assertEqual(payload.album.processingState, "completed")
             self.assertEqual(payload.album.outputPath, str(output_dir.resolve()))
-            self.assertEqual(payload.album.title, "2025 - Album Organized")
+            self.assertEqual(payload.album.title, "Album Organized")
             self.assertEqual(payload.album.artist, "Artist Clean")
 
     def test_runtime_resolver_downgrades_to_raw_when_output_deleted_after_being_valid(self):
@@ -229,7 +230,8 @@ class LibraryProcessedOutputTests(unittest.TestCase):
             ):
                 payload = list_albums_for_root(str(root))
 
-            self.assertEqual(payload.albums[0].title, "2022 - DECIDE")
+            self.assertEqual(payload.albums[0].title, "DECIDE")
+            self.assertEqual(payload.albums[0].year, "2022")
 
     def test_related_releases_payload_assigns_stable_ids_without_serializer_collision(self):
         with TemporaryDirectory() as root_dir:

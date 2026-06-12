@@ -69,6 +69,32 @@ class CoreLibraryPreviewTests(unittest.TestCase):
 
         self.assertEqual(len(previews), 1)
         self.assertEqual(previews[0].album_title, "начало")
+        self.assertEqual(previews[0].release_year, "2024")
+
+    @patch("musorg.core.library_preview.load_album_cover_bytes")
+    @patch("musorg.core.library_preview.read_tags")
+    def test_scan_album_previews_reads_year_from_date_tag_without_iso(self, read_tags_mock, cover_mock):
+        read_tags_mock.return_value = {
+            "title": "в темноте",
+            "tracknumber": "01",
+            "duration_seconds": 200.0,
+            "has_tracknumber_tag": True,
+            "artist": "Астра",
+            "albumartist": "Астра",
+            "album": "навсегда",
+            "date": "2026",
+        }
+        cover_mock.return_value = b"cover"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            album_dir = f"{temp_dir}/Астра/2026 - навсегда"
+            self._touch_flac(f"{album_dir}/01 - track.flac")
+
+            previews = scan_album_previews(temp_dir)
+
+        self.assertEqual(len(previews), 1)
+        self.assertEqual(previews[0].album_title, "навсегда")
+        self.assertEqual(previews[0].release_year, "2026")
 
     @patch("musorg.core.library_preview.load_album_cover_bytes")
     @patch("musorg.core.library_preview.read_tags")

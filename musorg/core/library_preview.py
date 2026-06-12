@@ -21,6 +21,7 @@ class AlbumPreview:
     folder_path: str
     status: str
     issues: tuple[str, ...] = ()
+    release_year: str = ""
 
 
 @dataclass(frozen=True)
@@ -195,6 +196,17 @@ def _album_title_from_tags(tags_by_path: dict[str, dict | None], fallback: str) 
     return max(counts, key=lambda name: (counts[name], name))
 
 
+def _album_release_year(tags_by_path: dict[str, dict | None]) -> str:
+    """First usable release year across the folder (same logic as the detail)."""
+    for tags in tags_by_path.values():
+        if not tags:
+            continue
+        year = _release_year_from_tags(tags)
+        if year:
+            return year
+    return ""
+
+
 def _build_album_preview(
     root: Path,
     folder: Path,
@@ -204,6 +216,7 @@ def _build_album_preview(
     if tags_by_path is None:
         tags_by_path = _read_tags_map(flac_paths)
     album_title = _album_title_from_tags(tags_by_path, folder.name or "Unknown Album")
+    release_year = _album_release_year(tags_by_path)
     relative_parts = folder.relative_to(root).parts if folder.is_relative_to(root) else folder.parts
     raw_artist_name = relative_parts[-2] if len(relative_parts) >= 2 else "Unknown artist"
     folder_artist = _sanitize_artist(raw_artist_name)
@@ -219,6 +232,7 @@ def _build_album_preview(
         folder_path=str(folder),
         status="Ready" if not issues else "Needs Fix",
         issues=issues,
+        release_year=release_year,
     )
 
 
