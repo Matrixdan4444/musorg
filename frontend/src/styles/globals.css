@@ -265,7 +265,7 @@
   }
 
   .glass-panel {
-    @apply border bg-panel/80 backdrop-blur-md;
+    @apply border bg-panel/95;
     border-color: hsl(var(--border-soft) / 0.74);
     box-shadow: var(--shadow-panel);
   }
