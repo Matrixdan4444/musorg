@@ -47,6 +47,31 @@ class CoreLibraryPreviewTests(unittest.TestCase):
 
     @patch("musorg.core.library_preview.load_album_cover_bytes")
     @patch("musorg.core.library_preview.read_tags")
+    def test_scan_album_previews_prefers_album_tag_over_folder_name(self, read_tags_mock, cover_mock):
+        read_tags_mock.return_value = {
+            "title": "мой дивный мир",
+            "tracknumber": "01",
+            "duration_seconds": 231.0,
+            "has_tracknumber_tag": True,
+            "artist": "Астра",
+            "albumartist": "Астра",
+            "album": "начало",
+            "release_date_iso": "2024-01-01",
+            "date": "2024",
+        }
+        cover_mock.return_value = b"cover"
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            album_dir = f"{temp_dir}/Астра/2024 - начало"
+            self._touch_flac(f"{album_dir}/01 - track.flac")
+
+            previews = scan_album_previews(temp_dir)
+
+        self.assertEqual(len(previews), 1)
+        self.assertEqual(previews[0].album_title, "начало")
+
+    @patch("musorg.core.library_preview.load_album_cover_bytes")
+    @patch("musorg.core.library_preview.read_tags")
     def test_scan_album_previews_prefers_tag_artist_over_unknown_folder_artist(self, read_tags_mock, cover_mock):
         read_tags_mock.return_value = {
             "title": "Track",

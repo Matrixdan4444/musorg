@@ -175,6 +175,26 @@ def _read_tags_map(flac_paths: list[Path]) -> dict[str, dict | None]:
     return {str(path): read_tags(str(path)) for path in flac_paths}
 
 
+def _album_title_from_tags(tags_by_path: dict[str, dict | None], fallback: str) -> str:
+    """Prefer the album tag (most common across the folder) over the folder name.
+
+    The folder is often named "Year - Album" or "Artist - Album", so the embedded
+    album tag is the truthful title to show. Falls back to the folder name when no
+    usable album tag is present.
+    """
+    counts: dict[str, int] = {}
+    for tags in tags_by_path.values():
+        if not tags:
+            continue
+        value = str(tags.get("album") or "").strip()
+        if not value or value == "Unknown":
+            continue
+        counts[value] = counts.get(value, 0) + 1
+    if not counts:
+        return fallback
+    return max(counts, key=lambda name: (counts[name], name))
+
+
 def _build_album_preview(
     root: Path,
     folder: Path,
@@ -183,7 +203,7 @@ def _build_album_preview(
 ) -> AlbumPreview:
     if tags_by_path is None:
         tags_by_path = _read_tags_map(flac_paths)
-    album_title = folder.name or "Unknown Album"
+    album_title = _album_title_from_tags(tags_by_path, folder.name or "Unknown Album")
     relative_parts = folder.relative_to(root).parts if folder.is_relative_to(root) else folder.parts
     raw_artist_name = relative_parts[-2] if len(relative_parts) >= 2 else "Unknown artist"
     folder_artist = _sanitize_artist(raw_artist_name)
