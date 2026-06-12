@@ -144,7 +144,7 @@ export function OutputFolderFormatCard({
                     className={cn(
                       "rounded-[22px] border px-4 py-4 text-left transition",
                       selected
-                        ? "border-[hsl(var(--info-border)/0.48)] bg-surface-selected/90 shadow-card"
+                        ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90 shadow-card"
                         : "border-border-soft/80 bg-surface-subtle/80 hover:border-border-strong/80 hover:bg-surface-subtle",
                     )}
                     type="button"
@@ -274,7 +274,7 @@ export function OutputFolderFormatCard({
                             key={option}
                             className={cn(
                               "flex w-full items-center justify-between gap-4 rounded-[16px] border px-4 py-3 text-left transition",
-                              selected ? "border-[hsl(var(--info-border)/0.5)] bg-surface-selected/90" : "border-border-soft/80 bg-surface-subtle/80 hover:bg-surface-subtle",
+                              selected ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90" : "border-border-soft/80 bg-surface-subtle/80 hover:bg-surface-subtle",
                             )}
                             type="button"
                             onClick={() => void update({ ...draft, discHandling: option })}
@@ -304,7 +304,7 @@ export function OutputFolderFormatCard({
                             key={option}
                             className={cn(
                               "rounded-[16px] border px-3 py-2 text-left transition",
-                              selected ? "border-[hsl(var(--info-border)/0.5)] bg-surface-selected/90" : "border-border-soft/80 bg-surface-subtle/80 hover:bg-surface-subtle",
+                              selected ? "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90" : "border-border-soft/80 bg-surface-subtle/80 hover:bg-surface-subtle",
                             )}
                             type="button"
                             onClick={() => void update({ ...draft, fileNaming: option })}
