@@ -27,7 +27,7 @@ from musorg.api.schemas.music import (
 from musorg.api.services.settings import get_effective_library_root, get_library_settings_state
 from musorg.core.cover_art import load_album_cover_bytes
 from musorg.core.issue_counts import summarize_actionable_issue_items
-from musorg.core.insights import InsightRegistry, build_insight_registry
+from musorg.core.insights import build_insight_registry
 from musorg.core.library_preview import AlbumDetail, AlbumPreview, TrackPreview, load_album_detail, scan_album_previews
 from musorg.core.release_intelligence import ReleaseIntelligenceRegistry, build_release_intelligence_registry
 from musorg.core.smart_actions import build_smart_action_registry

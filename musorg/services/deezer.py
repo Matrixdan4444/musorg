@@ -2,14 +2,13 @@ import json
 import re
 import threading
 import time
-import unicodedata
 from datetime import datetime
 
 import requests
 from rapidfuzz import fuzz
 
 from musorg.core.runtime_state import is_developer_mode
-from musorg.metadata.normalizer import VERSION_WORDS, normalize_lookup_text_for_matching
+from musorg.metadata.normalizer import normalize_lookup_text_for_matching
 from musorg.services.album_match import (
     LookupInput,
     album_query_variants as shared_album_query_variants,
@@ -28,11 +27,9 @@ from musorg.services.album_match import (
     lookup_input_signature,
     normalize_album_title as shared_normalize_album_title,
     normalize_lookup_text,
-    normalized_title_for_matching,
     provider_metadata_evidence,
     resolution_failure,
     resolution_success,
-    russian_transliteration_variant,
     split_credit_names as shared_split_credit_names,
     strict_album_title_match as shared_strict_album_title_match,
     track_title_sequence_score_from_titles,
@@ -1202,8 +1199,6 @@ def log_developer_rescue_phase(
     log("Deezer", f"[DEV MODE] Running rescue phase '{phase}' for {artist} - {album}", "🧪")
     if attempts:
         log("Deezer", f"[DEV MODE] {phase} attempts for {artist} - {album}: {search_attempt_debug_entries(attempts)}", "🧪")
-    if phase == "track-count-mismatch" and attempts is None:
-        cluster_size = len(title_cluster_candidates([], album))
 
 
 def pick_album_candidate(
@@ -1900,7 +1895,6 @@ def get_album_data(
             return result
 
     album_artist = canonical_album_artist(album_data.get("artist", {}).get("name"), artist)
-    album_artist_text = album_artist or "unknown artist"
     album_title = album_data.get("title") or album
     release_date_iso = album_data.get("release_date")
     genre = genre_value(album_data)

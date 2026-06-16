@@ -1,0 +1,15 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+extend-exclude = ["venv", ".venv", "frontend", "build", "dist", "test/results"]
+
+[tool.ruff.lint]
+# Pyflakes only: catches real problems (unused imports, undefined names,
+# redefinitions) without imposing whole-codebase style reformatting.
+select = ["F"]
+
+[tool.ruff.lint.per-file-ignores]
+# organizer.py is a deliberate re-export facade: it imports filesystem helpers
+# (is_standalone_single, single_release_group_key, normalize_picture_data, ...)
+# so organize_stage and the tests can import them from one place.
+"musorg/filesystem/organizer.py" = ["F401"]

@@ -2,7 +2,6 @@ import re
 import socket
 import ssl
 import time
-import unicodedata
 from datetime import datetime
 from urllib.request import HTTPSHandler
 
@@ -492,7 +491,6 @@ def release_group_score(
     expected_track_count: int | None = None,
     preferred_release_type: str | None = None,
 ) -> tuple:
-    rg_title = rg.get("title", "")
     rg_artist = artist_credit_phrase(rg) or ""
     primary_type = rg.get("primary-type", "").lower()
     preferred_type_rank = release_group_preference_rank(primary_type, preferred_release_type)

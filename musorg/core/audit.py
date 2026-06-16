@@ -371,7 +371,6 @@ def detect_duplicate_albums(source_album_groups: dict[tuple[str, str], list[dict
     identity_buckets = {}
 
     for group_tracks in candidate_groups:
-        group_id = id(group_tracks)
         release_ids = _group_musicbrainz_release_ids(group_tracks)
         for release_id in release_ids:
             release_id_buckets.setdefault(release_id, []).append(group_tracks)

@@ -716,7 +716,6 @@ def _build_cleanup_action(
         confidence_level=confidence_level,
     )
     detected_by = _cleanup_detected_by(categories, suspicious_ids, release_actions, confidence_level)
-    capability = _cleanup_capability(category, impact, suspicious_ids, release_actions, confidence_level)
     why_matters = _cleanup_why_matters(category, impact, suspicious_ids)
     suggested_fix = _cleanup_suggested_fix(
         category,

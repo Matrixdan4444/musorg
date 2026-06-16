@@ -4,7 +4,6 @@ from collections import Counter
 from dataclasses import dataclass
 from hashlib import sha1
 from pathlib import Path
-import math
 import re
 
 from rapidfuzz import fuzz

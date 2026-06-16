@@ -15,7 +15,6 @@ from musorg.api.schemas.music import (
     BatchEditArtworkStateSchema,
     BatchEditEditorStateSchema,
     BatchEditFindArtworkRequestSchema,
-    BatchEditFindReleaseRequestSchema,
     BatchEditTrackSchema,
     LibrarySettingsResponse,
 )

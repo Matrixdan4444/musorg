@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import base64
 import json
-import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -10,7 +9,6 @@ from pathlib import Path
 from fastapi import HTTPException
 
 from musorg.api.schemas.music import (
-    AlbumActionsResponseSchema,
     AlbumIssueSchema,
     AlbumsResponse,
     BatchEditAlbumDetailResponseSchema,
