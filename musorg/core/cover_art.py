@@ -4,6 +4,8 @@ from pathlib import Path
 
 from mutagen.flac import FLAC
 
+from musorg.utils.debug import warning
+
 
 _FOLDER_COVER_NAMES = ("cover.jpg", "folder.jpg", "front.jpg")
 
@@ -25,7 +27,8 @@ def _load_embedded_cover_bytes(folder: Path) -> bytes | None:
             continue
         try:
             audio = FLAC(file_path)
-        except Exception:
+        except Exception as exc:
+            warning("CoverArt", f"Skipping unreadable FLAC {file_path}: {exc}")
             continue
         pictures = getattr(audio, "pictures", None) or []
         if pictures:

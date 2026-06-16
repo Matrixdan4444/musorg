@@ -26,7 +26,7 @@ from musorg.services.album_match import (
 )
 from musorg.services.deezer import clear_deezer_cache, get_album_data
 from musorg.services.musicbrainz import clear_musicbrainz_caches, fetch_metadata_result
-from musorg.utils.debug import set_log_console_enabled
+from musorg.utils.debug import set_log_console_enabled, warning
 
 
 def prepare_track_for_match_stress(tags: dict) -> dict:
@@ -331,9 +331,19 @@ def resolve_match_stress_entries(
             executor.submit(resolve_match_stress_entry, entry, use_cache): index
             for index, entry in pending_entries
         }
+        entry_by_index = dict(pending_entries)
         for future in as_completed(future_map):
-            resolved_entry = future.result()
-            resolved_entries[future_map[future]] = resolved_entry
+            index = future_map[future]
+            try:
+                resolved_entry = future.result()
+            except Exception as exc:
+                # Keep the batch alive: preserve the failed entry with an error
+                # marker instead of letting one failure abort every result.
+                source_entry = entry_by_index.get(index, {})
+                warning("MatchStress", f"Failed to resolve entry {source_entry.get('group_id')}: {exc}")
+                resolved_entries[index] = {**source_entry, "error": str(exc)}
+                continue
+            resolved_entries[index] = resolved_entry
             if on_entry_resolved is not None:
                 on_entry_resolved(resolved_entry)
 

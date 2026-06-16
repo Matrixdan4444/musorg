@@ -1,6 +1,7 @@
 import os
 import shutil
 import tempfile
+import threading
 
 from musorg.core.cover_art import load_album_cover_bytes
 from musorg.filesystem.media import create_flac_file, normalize_picture_data, resolve_executable
@@ -38,12 +39,16 @@ from musorg.utils.debug import error, log
 _SESSION_DESTINATIONS = set()
 _SESSION_CLEANED_ALBUMS = set()
 _SESSION_WRITTEN_COVER_FILES = set()
+# Guards the session sets above so concurrent organize runs in one process
+# (e.g. overlapping FastAPI requests) cannot corrupt duplicate-detection state.
+_SESSION_LOCK = threading.RLock()
 
 
 def reset_session_state() -> None:
-    _SESSION_DESTINATIONS.clear()
-    _SESSION_CLEANED_ALBUMS.clear()
-    _SESSION_WRITTEN_COVER_FILES.clear()
+    with _SESSION_LOCK:
+        _SESSION_DESTINATIONS.clear()
+        _SESSION_CLEANED_ALBUMS.clear()
+        _SESSION_WRITTEN_COVER_FILES.clear()
     reset_cover_download_cache()
 
 
@@ -149,23 +154,24 @@ def copy_track_to_destination(track: dict, destination: str, dry_run: bool = Fal
 
 def unique_destination_path(destination: str, record: bool = True) -> str:
     destination = normalize_filesystem_path(destination)
-    destination_key = filesystem_path_key(destination)
-    if destination_key not in _SESSION_DESTINATIONS:
-        if record:
-            _SESSION_DESTINATIONS.add(destination_key)
-        return destination
-
-    stem, extension = os.path.splitext(destination)
-    index = 2
-    while True:
-        candidate = f"{stem} ({index}){extension}"
-        candidate = normalize_filesystem_path(candidate)
-        candidate_key = filesystem_path_key(candidate)
-        if candidate_key not in _SESSION_DESTINATIONS:
+    with _SESSION_LOCK:
+        destination_key = filesystem_path_key(destination)
+        if destination_key not in _SESSION_DESTINATIONS:
             if record:
-                _SESSION_DESTINATIONS.add(candidate_key)
-            return candidate
-        index += 1
+                _SESSION_DESTINATIONS.add(destination_key)
+            return destination
+
+        stem, extension = os.path.splitext(destination)
+        index = 2
+        while True:
+            candidate = f"{stem} ({index}){extension}"
+            candidate = normalize_filesystem_path(candidate)
+            candidate_key = filesystem_path_key(candidate)
+            if candidate_key not in _SESSION_DESTINATIONS:
+                if record:
+                    _SESSION_DESTINATIONS.add(candidate_key)
+                return candidate
+            index += 1
 
 
 def _save_cover_sidecar_enabled(track: dict) -> bool:
@@ -192,15 +198,21 @@ def ensure_cover_sidecar(track: dict, album_root: str, dry_run: bool = False, jo
 
     cover_path = normalize_filesystem_path(os.path.join(album_root, "Cover.jpg"))
     cover_key = filesystem_path_key(cover_path)
-    if cover_key in _SESSION_WRITTEN_COVER_FILES:
-        return
+    with _SESSION_LOCK:
+        if cover_key in _SESSION_WRITTEN_COVER_FILES:
+            return
 
     run_report = getattr(journal, "run_report", None) if journal else None
     cover_bytes = resolve_cover_sidecar_bytes(track, run_report=run_report)
     if not cover_bytes:
         return
 
-    _SESSION_WRITTEN_COVER_FILES.add(cover_key)
+    # Re-check under the lock: only claim the key once we know we have bytes to
+    # write, so an earlier byte-less track does not block a later one.
+    with _SESSION_LOCK:
+        if cover_key in _SESSION_WRITTEN_COVER_FILES:
+            return
+        _SESSION_WRITTEN_COVER_FILES.add(cover_key)
     if dry_run:
         if journal:
             journal.record("preview_write_file", path=cover_path)
@@ -228,11 +240,11 @@ def cleanup_existing_album_folders(
         filesystem_path_key(root_output),
         filesystem_path_key(target_folder),
     )
-    if cleanup_key in _SESSION_CLEANED_ALBUMS:
-        return
-
-    if not dry_run:
-        _SESSION_CLEANED_ALBUMS.add(cleanup_key)
+    with _SESSION_LOCK:
+        if cleanup_key in _SESSION_CLEANED_ALBUMS:
+            return
+        if not dry_run:
+            _SESSION_CLEANED_ALBUMS.add(cleanup_key)
 
     if os.path.isdir(target_folder):
         if dry_run:
@@ -298,7 +310,21 @@ def replace_directory(source: str, destination: str, dry_run: bool = False, jour
         os.rename(source, destination)
     except Exception:
         if old_destination and not os.path.isdir(destination):
-            os.rename(old_destination, destination)
+            try:
+                os.rename(old_destination, destination)
+            except Exception as restore_error:
+                # The original content is still intact inside old_destination.
+                # Surface its location so the user can recover it instead of
+                # leaving an orphaned backup with no trace.
+                error(
+                    "Organize",
+                    f"Failed to restore {destination} after a failed move; "
+                    f"the original content is preserved at {old_destination}",
+                )
+                raise RuntimeError(
+                    f"Could not restore {destination} after a failed move. "
+                    f"Original content is preserved at {old_destination}."
+                ) from restore_error
         raise
 
     if old_destination:

@@ -167,7 +167,8 @@ def restore_flac_pictures(file_path, pictures, run_report=None):
 
     try:
         audio = FLAC(file_path)
-    except Exception:
+    except Exception as exc:
+        warning("Tagging", f"Could not restore cover art on {file_path}: {exc}")
         return
 
     audio.clear_pictures()
@@ -196,7 +197,8 @@ def restore_flac_pictures(file_path, pictures, run_report=None):
 def clear_comment_tags(file_path):
     try:
         audio = File(file_path)
-    except Exception:
+    except Exception as exc:
+        warning("Tagging", f"Could not clear comment tags on {file_path}: {exc}")
         return
 
     if not audio or not getattr(audio, "tags", None):
@@ -245,7 +247,8 @@ def write_cover_art(file_path, cover_url, run_report=None):
 
     try:
         audio = FLAC(file_path)
-    except Exception:
+    except Exception as exc:
+        warning("Tagging", f"Could not write cover art to {file_path}: {exc}")
         return
 
     picture = build_cover_picture(cover_url, run_report=run_report)
@@ -477,7 +480,8 @@ def write_metadata_tags(file_path, track, run_report=None, metadata_preservation
 def remove_cover_art(file_path):
     try:
         audio = File(file_path)
-    except Exception:
+    except Exception as exc:
+        warning("Tagging", f"Could not remove cover art from {file_path}: {exc}")
         return
 
     if not audio:
@@ -500,7 +504,8 @@ def write_cover_art_bytes(file_path, picture_data: bytes, mime_type: str = "imag
 
     try:
         audio = FLAC(file_path)
-    except Exception:
+    except Exception as exc:
+        warning("Tagging", f"Could not write cover art bytes to {file_path}: {exc}")
         return
 
     if run_report:

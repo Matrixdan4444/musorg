@@ -1201,7 +1201,27 @@ def fetch_album_metadata(
 
         for future in as_completed(future_to_signature):
             signature = future_to_signature[future]
-            assign_signature_result(signature, future.result())
+            try:
+                resolved = future.result()
+            except Exception as exc:
+                # A single album failing (corrupt file, network error) must not
+                # abort the whole batch — record it as an unresolved album.
+                artist, album, *_rest = unpack_album_metadata_payload(payload_by_signature[signature])
+                warning("Metadata", f"Failed to resolve metadata for {artist} — {album}: {exc}")
+                resolved = {
+                    "musicbrainz": None,
+                    "deezer": None,
+                    "deezer_result": None,
+                    "musicbrainz_result": None,
+                    "winner": None,
+                    "path": None,
+                    "timings": {
+                        "deezer_phase": 0.0,
+                        "musicbrainz_fallback_phase": 0.0,
+                        "album_total": 0.0,
+                    },
+                }
+            assign_signature_result(signature, resolved)
             if on_resolved:
                 resolved = resolved_by_signature[signature]
                 on_resolved(
