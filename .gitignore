@@ -9,6 +9,10 @@ frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
 
+# PyInstaller build artifacts (the Musorg.spec recipe itself stays tracked)
+/build/
+/dist/
+
 # macOS
 .DS_Store
 
