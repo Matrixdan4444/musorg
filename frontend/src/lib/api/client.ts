@@ -14,57 +14,93 @@ export class ApiError extends Error {
 }
 
 
-export async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+// Default per-request timeout. Without this a stalled backend would hang the
+// request (and any UI waiting on it) indefinitely.
+const DEFAULT_TIMEOUT_MS = 30_000;
 
-  if (!response.ok) {
-    const message = await readErrorMessage(response);
-    throw new ApiError(message || `Request failed: ${response.status}`, response.status);
+export interface RequestOptions {
+  /** Caller-supplied abort signal; composed with the internal timeout. */
+  signal?: AbortSignal;
+  /** Override the default request timeout (ms). Pass 0 to disable. */
+  timeoutMs?: number;
+}
+
+async function request<T>(path: string, init: RequestInit, options: RequestOptions = {}): Promise<T> {
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+  const timeoutController = timeoutMs > 0 ? new AbortController() : null;
+  const timeoutId = timeoutController
+    ? window.setTimeout(() => timeoutController.abort(), timeoutMs)
+    : null;
+
+  // Abort if either the caller's signal or our timeout fires.
+  const signal = composeSignals(options.signal, timeoutController?.signal);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, { ...init, signal: signal ?? null });
+    if (!response.ok) {
+      const message = await readErrorMessage(response);
+      throw new ApiError(message || `Request failed: ${response.status}`, response.status);
+    }
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError" && timeoutController?.signal.aborted) {
+      throw new ApiError(`Request timed out after ${timeoutMs}ms`, 0);
+    }
+    throw error;
+  } finally {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
   }
+}
 
-  return (await response.json()) as T;
+function composeSignals(...signals: Array<AbortSignal | undefined>): AbortSignal | undefined {
+  const present = signals.filter((value): value is AbortSignal => Boolean(value));
+  if (present.length === 0) {
+    return undefined;
+  }
+  if (present.length === 1) {
+    return present[0];
+  }
+  const controller = new AbortController();
+  for (const signal of present) {
+    if (signal.aborted) {
+      controller.abort();
+      break;
+    }
+    signal.addEventListener("abort", () => controller.abort(), { once: true });
+  }
+  return controller.signal;
+}
+
+export async function getJson<T>(path: string, options?: RequestOptions): Promise<T> {
+  return request<T>(path, { headers: { Accept: "application/json" } }, options);
 }
 
 
-export async function postJson<TResponse, TBody>(path: string, body?: TBody): Promise<TResponse> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+export async function postJson<TResponse, TBody>(path: string, body?: TBody, options?: RequestOptions): Promise<TResponse> {
+  return request<TResponse>(
+    path,
+    {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: body === undefined ? null : JSON.stringify(body),
     },
-    body: body === undefined ? null : JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const message = await readErrorMessage(response);
-    throw new ApiError(message || `Request failed: ${response.status}`, response.status);
-  }
-
-  return (await response.json()) as TResponse;
+    options,
+  );
 }
 
 
-export async function putJson<TResponse, TBody>(path: string, body?: TBody): Promise<TResponse> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: "PUT",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
+export async function putJson<TResponse, TBody>(path: string, body?: TBody, options?: RequestOptions): Promise<TResponse> {
+  return request<TResponse>(
+    path,
+    {
+      method: "PUT",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: body === undefined ? null : JSON.stringify(body),
     },
-    body: body === undefined ? null : JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const message = await readErrorMessage(response);
-    throw new ApiError(message || `Request failed: ${response.status}`, response.status);
-  }
-
-  return (await response.json()) as TResponse;
+    options,
+  );
 }
 
 

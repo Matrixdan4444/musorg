@@ -206,7 +206,14 @@ class LogStreamStore {
     };
 
     socket.onmessage = (event) => {
-      const payload = JSON.parse(event.data) as LogEntry;
+      let payload: LogEntry;
+      try {
+        payload = JSON.parse(event.data) as LogEntry;
+      } catch (error) {
+        // A single malformed frame must not tear down the whole stream.
+        devLog(this.developerMode, "Failed to parse log stream message", { error: String(error) });
+        return;
+      }
       if (payload.type === "connection") {
         const connectionPayload = (payload.payload as {
           activeRunId?: string | null;
@@ -257,6 +264,28 @@ class LogStreamStore {
       devLog(this.developerMode, "Reconnected to log stream");
       void this.ensureConnected(this.developerMode);
     }, 1500);
+  }
+
+  /**
+   * Tear down the live connection: cancel any pending reconnect and close the
+   * socket without triggering the auto-reconnect path. Safe to call repeatedly.
+   */
+  disconnect() {
+    if (this.reconnectTimer !== null) {
+      window.clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    const socket = this.socket;
+    if (socket) {
+      this.socket = null;
+      // Detach handlers first so onclose does not schedule a reconnect.
+      socket.onopen = null;
+      socket.onmessage = null;
+      socket.onclose = null;
+      socket.onerror = null;
+      socket.close();
+    }
+    this.setState({ status: "idle" });
   }
 
   setPaused(paused: boolean) {
@@ -495,3 +524,9 @@ function nextSessionStateForEvent(currentState: RuntimeSessionState, entry: LogE
 }
 
 export const logStreamStore = new LogStreamStore();
+
+if (typeof window !== "undefined") {
+  // Release the socket and any pending reconnect timer when the page unloads
+  // (e.g. the ErrorBoundary's reload) instead of leaking them.
+  window.addEventListener("pagehide", () => logStreamStore.disconnect());
+}
