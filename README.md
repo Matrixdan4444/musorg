@@ -20,6 +20,31 @@ into a consistent `Artist/Album` structure.
 - **Library health checks** — flags albums with missing covers, unknown artists,
   missing track numbers, or inconsistent album artists.
 
+## Download (macOS)
+
+Download the latest `Musorg-*.dmg` from the
+[Releases](https://github.com/Matrixdan4444/musorg/releases) page, open it, and
+drag **Musorg** into **Applications**.
+
+The app is **not signed with an Apple Developer ID**, so on first launch macOS
+Gatekeeper will block it — warning that it's from an "unidentified developer"
+or, on recent macOS, that the app "is damaged and can't be opened." This is
+expected for an open-source app distributed without a paid Apple certificate.
+To run it the first time, do **one** of the following:
+
+- **Right-click** (or Control-click) `Musorg.app` in Applications, choose
+  **Open**, then **Open** in the dialog. macOS remembers the choice afterwards.
+
+- Or remove the quarantine flag from Terminal, then open the app normally:
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/Musorg.app
+  ```
+
+> Transcoding non-FLAC source files needs [`ffmpeg`](https://ffmpeg.org) on your
+> `PATH` (`brew install ffmpeg`). FLAC-only libraries don't need it; cover-art
+> resizing uses `sips`, which is built into macOS.
+
 ## Architecture
 
 One supported desktop runtime:
@@ -33,9 +58,10 @@ All processing flows through a single pipeline: **scan → read metadata → gro
 by album → organize**. See [`docs/architecture.md`](docs/architecture.md) for
 details.
 
-## Installation
+## Build from source
 
-Requires Python 3.12+ and Node.js.
+For development, or to run without the prebuilt `.dmg`. Requires Python 3.12+
+and Node.js.
 
 **Backend:**
 
