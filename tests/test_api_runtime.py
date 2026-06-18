@@ -7,11 +7,27 @@ from pathlib import Path
 from musorg.api.server import ApiRuntimeConfig, create_app
 
 
+def _registered_paths(app) -> set[str]:
+    """Collect every registered path in a FastAPI-version-agnostic way.
+
+    Newer FastAPI wraps included routers in `_IncludedRouter` objects that have
+    no `.path`, so iterating `app.routes` alone no longer exposes router paths.
+    The OpenAPI schema carries the API paths; the static/catch-all routes are
+    still top-level routes with a `.path`. Union both.
+    """
+    paths = set(app.openapi().get("paths", {}).keys())
+    for route in app.routes:
+        path = getattr(route, "path", None)
+        if path:
+            paths.add(path)
+    return paths
+
+
 class ApiRuntimeTests(unittest.TestCase):
     def test_create_app_exposes_expected_routes(self):
         app = create_app()
 
-        routes = {route.path for route in app.routes}
+        routes = _registered_paths(app)
 
         self.assertIn("/health", routes)
         self.assertIn("/albums", routes)
@@ -36,6 +52,6 @@ class ApiRuntimeTests(unittest.TestCase):
 
             app = create_app(ApiRuntimeConfig(frontend_dist=dist, allow_origins=[]))
 
-        routes = {route.path for route in app.routes}
+        routes = _registered_paths(app)
         self.assertIn("/", routes)
         self.assertIn("/{full_path:path}", routes)
