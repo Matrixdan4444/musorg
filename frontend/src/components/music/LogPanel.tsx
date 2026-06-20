@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { ModalPortal } from "@/components/ModalPortal";
 import { Panel } from "@/components/Panel";
 import { useLogsStream } from "@/hooks/useLogsStream";
 import { useI18n } from "@/i18n/useI18n";
@@ -126,6 +127,7 @@ export function LogPanel({ developerMode, open, onOpen, onClose }: LogPanelProps
         </div>
       </Panel>
 
+      <ModalPortal>
       <AnimatePresence>
       {open ? (
         <motion.div
@@ -203,6 +205,7 @@ export function LogPanel({ developerMode, open, onOpen, onClose }: LogPanelProps
         </motion.div>
       ) : null}
       </AnimatePresence>
+      </ModalPortal>
     </>
   );
 }

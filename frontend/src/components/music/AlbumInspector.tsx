@@ -2,6 +2,7 @@ import { AlertTriangle, Check, ChevronDown, Eye, Music4, ShieldCheck, Sparkles, 
 import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { CoverImage } from "@/components/music/CoverImage";
+import { ModalPortal } from "@/components/ModalPortal";
 import { Panel } from "@/components/Panel";
 import { IssueBadge } from "@/components/music/IssueBadge";
 import { useI18n } from "@/i18n/useI18n";
@@ -1051,20 +1052,22 @@ function ModalFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-      <Panel className="app-modal-panel flex max-h-[80vh] w-full max-w-[720px] flex-col p-0">
-        <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
-          <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">{title}</h2>
-          <button
-            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-subtle/75 hover:text-[hsl(var(--text-strong))]"
-            type="button"
-            onClick={onClose}
-          >
-            ×
-          </button>
-        </div>
-        <div className="min-h-0 overflow-y-auto px-5 py-4">{children}</div>
-      </Panel>
-    </div>
+    <ModalPortal>
+      <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+        <Panel className="app-modal-panel flex max-h-[80vh] w-full max-w-[720px] flex-col p-0">
+          <div className="flex items-center justify-between border-b border-border-soft/75 px-5 py-4">
+            <h2 className="text-[15px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">{title}</h2>
+            <button
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-subtle/75 hover:text-[hsl(var(--text-strong))]"
+              type="button"
+              onClick={onClose}
+            >
+              ×
+            </button>
+          </div>
+          <div className="min-h-0 overflow-y-auto px-5 py-4">{children}</div>
+        </Panel>
+      </div>
+    </ModalPortal>
   );
 }

@@ -1,4 +1,4 @@
-import { Pencil } from "lucide-react";
+import { Check, Pencil } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { IssueBadge } from "@/components/music/IssueBadge";
 import { useI18n } from "@/i18n/useI18n";
@@ -77,11 +77,15 @@ export function TrackTable({
               >
                 <td className="px-4 py-3">
                   <button
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-accent text-[11px] text-accent-foreground"
+                    className={
+                      selectedTrackIds.has(track.id)
+                        ? "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-transparent bg-accent text-accent-foreground"
+                        : "inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-border-soft bg-transparent text-transparent"
+                    }
                     type="button"
                     onClick={() => onToggleTrack(track.id)}
                   >
-                    {selectedTrackIds.has(track.id) ? "✓" : ""}
+                    <Check className="h-3.5 w-3.5" />
                   </button>
                 </td>
                 <td className="px-2 py-3 text-muted-foreground">{track.index}</td>
