@@ -94,22 +94,6 @@ export function useLibrarySettings() {
     }
   }, [applyResolvedPayload, buildSettingsPayload, t]);
 
-  const saveDeveloperMode = useCallback(async (developerMode: boolean) => {
-    try {
-      setSaving(true);
-      setError(null);
-      setMessage(null);
-      const payload = await setLibrarySettings(buildSettingsPayload({ developerMode }));
-      return applyResolvedPayload(payload);
-    } catch (err) {
-      const nextError = err instanceof Error ? err.message : t("settings.errors.saveDeveloperMode");
-      setError(nextError);
-      return null;
-    } finally {
-      setSaving(false);
-    }
-  }, [applyResolvedPayload, buildSettingsPayload, t]);
-
   const saveLanguage = useCallback(async (language: LanguageCode) => {
     try {
       setSaving(true);
@@ -298,7 +282,6 @@ export function useLibrarySettings() {
     clearError,
     refetch,
     saveLibraryRoots,
-    saveDeveloperMode,
     saveLanguage,
     saveThemeMode,
     saveAccentColor,

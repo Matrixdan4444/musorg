@@ -50,10 +50,6 @@ export const ru: LocaleShape<typeof en> = {
     subtitle: "Управляйте тем, как Musorg читает, проверяет и подготавливает музыкальную библиотеку.",
     runtimeTitle: "Обработка",
     runtimeDescription: "Выберите, как Musorg проверяет релизы и ведет журнал обработки.",
-    developerModeTitle: "Режим разработчика",
-    developerModeDescription: "Отключает повторное использование кэша и показывает подробную диагностику для отладки.",
-    developerModeEnabled: "Режим разработчика включен",
-    developerModeDisabled: "Режим разработчика выключен",
     enabled: "Включено",
     disabled: "Выключено",
     languageTitle: "Язык",
@@ -358,7 +354,6 @@ export const ru: LocaleShape<typeof en> = {
     errors: {
       load: "Не удалось загрузить настройки библиотеки.",
       save: "Не удалось сохранить настройки библиотеки.",
-      saveDeveloperMode: "Не удалось сохранить режим разработчика.",
       saveLanguage: "Не удалось сохранить язык.",
       pickLibrary: "Не удалось открыть выбор папки.",
       pickOutput: "Не удалось открыть выбор выходной папки.",

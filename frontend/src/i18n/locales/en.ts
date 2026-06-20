@@ -51,10 +51,6 @@ export const en = {
     subtitle: "Control how Musorg reads, checks, and prepares your music library.",
     runtimeTitle: "Processing",
     runtimeDescription: "Choose how Musorg verifies releases and records tidy-up activity.",
-    developerModeTitle: "Developer Mode",
-    developerModeDescription: "Turns off cache reuse and shows detailed diagnostics for troubleshooting.",
-    developerModeEnabled: "Developer mode enabled",
-    developerModeDisabled: "Developer mode disabled",
     enabled: "Enabled",
     disabled: "Disabled",
     languageTitle: "Language",
@@ -359,7 +355,6 @@ export const en = {
     errors: {
       load: "Failed to load library settings.",
       save: "Failed to save library settings.",
-      saveDeveloperMode: "Failed to save developer mode.",
       saveLanguage: "Failed to save language.",
       pickLibrary: "Failed to open the folder picker.",
       pickOutput: "Failed to open the output folder picker.",
