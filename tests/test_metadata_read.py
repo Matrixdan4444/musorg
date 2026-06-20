@@ -266,6 +266,59 @@ class ApplyMusicBrainzAlbumMetadataTests(unittest.TestCase):
         self.assertIsNone(musicbrainz_match)
         self.assertEqual(resolved_deezer_match, deezer_match)
 
+    def test_rejects_deezer_match_when_track_titles_do_not_correspond(self):
+        # Source has real titles; the Deezer candidate only shares the track
+        # count (a remix album). The match must be rejected so source titles are
+        # kept instead of being overwritten with unrelated remix names.
+        payload = ("Massive Attack", "Mezzanine", 3, ["Angel", "Risingson", "Teardrop"], None, {})
+        deezer_match = {
+            "albumartist": "Massive Attack",
+            "releasetype": "album",
+            "album": "Mezzanine - The Remixes",
+            "tracks": [
+                {"artist": "Massive Attack", "title": "Risingson (Underdog Mix)", "tracknumber": 1},
+                {"artist": "Massive Attack", "title": "Teardrop (Scream Team Remix)", "tracknumber": 2},
+                {"artist": "Massive Attack", "title": "Angel (Mad Professor Remix)", "tracknumber": 3},
+            ],
+            "expected_track_count": 3,
+        }
+        with (
+            mock.patch("musorg.core.stages.metadata_read.get_album_data", return_value=deezer_match),
+            mock.patch("musorg.core.stages.metadata_read.fetch_metadata", return_value=None),
+            mock.patch("musorg.core.stages.metadata_read.fetch_original_release_date", return_value=None),
+            mock.patch("musorg.core.stages.metadata_read.deezer_page_release_date", return_value=None),
+        ):
+            _key, _mb, resolved_deezer_match = fetch_single_album_metadata(
+                ("massive attack", "mezzanine"), payload, total_albums=1, index=1,
+            )
+        self.assertIsNone(resolved_deezer_match)
+
+    def test_keeps_deezer_match_when_titles_align_despite_remaster_suffix(self):
+        # A legit remaster (titles align after the remaster suffix is ignored)
+        # must NOT be rejected.
+        payload = ("Massive Attack", "Mezzanine", 3, ["Angel", "Risingson", "Teardrop"], None, {})
+        deezer_match = {
+            "albumartist": "Massive Attack",
+            "releasetype": "album",
+            "album": "Mezzanine",
+            "tracks": [
+                {"artist": "Massive Attack", "title": "Angel (2019 Remaster)", "tracknumber": 1},
+                {"artist": "Massive Attack", "title": "Risingson (2019 Remaster)", "tracknumber": 2},
+                {"artist": "Massive Attack", "title": "Teardrop (2019 Remaster)", "tracknumber": 3},
+            ],
+            "expected_track_count": 3,
+        }
+        with (
+            mock.patch("musorg.core.stages.metadata_read.get_album_data", return_value=deezer_match),
+            mock.patch("musorg.core.stages.metadata_read.fetch_metadata", return_value=None),
+            mock.patch("musorg.core.stages.metadata_read.fetch_original_release_date", return_value=None),
+            mock.patch("musorg.core.stages.metadata_read.deezer_page_release_date", return_value=None),
+        ):
+            _key, _mb, resolved_deezer_match = fetch_single_album_metadata(
+                ("massive attack", "mezzanine"), payload, total_albums=1, index=1,
+            )
+        self.assertEqual(resolved_deezer_match, deezer_match)
+
     def test_fetch_single_album_metadata_falls_back_to_musicbrainz_when_deezer_missing(self):
         payload = ("Artist", "Album", 1, ["Track 1"], None)
         musicbrainz_match = {

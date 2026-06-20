@@ -7,6 +7,7 @@ from musorg.core.release_intelligence import build_release_intelligence_registry
 from musorg.core.stages.metadata_read import source_album_group_key
 from musorg.filesystem.naming import default_output_format_settings, format_output_destination
 from musorg.filesystem.organizer import (
+    claim_album_root,
     cleanup_existing_album_folders,
     cleanup_stale_single_track,
     is_standalone_single,
@@ -63,6 +64,14 @@ def organize_stage(context):
         )
         output_settings = sample_track.get("_output_format_settings") or default_output_format_settings()
         album_destination = format_output_destination(sample_track, album_root_output, output_settings)
+        # Keep two distinct albums that resolve to the same folder apart: claim
+        # the folder for this group; if a different group already owns it, pin a
+        # disambiguated folder on every track so they don't merge.
+        resolved_album_root = claim_album_root(album_destination.album_root, source_album_group_key(sample_track))
+        if resolved_album_root != album_destination.album_root:
+            for track in album_tracks:
+                track["_album_root_override"] = resolved_album_root
+            album_destination = format_output_destination(sample_track, album_root_output, output_settings)
         run_report = getattr(context, "run_report", None)
         if run_report:
             with run_report.measure("album_conflict_cleanup"):

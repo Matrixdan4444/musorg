@@ -27,6 +27,7 @@ from musorg.services.album_match import (
     normalize_lookup_text,
     locale_track_sequence_title_rescue,
     normalized_title_for_matching as shared_normalized_title_for_matching,
+    normalized_track_title_for_matching as shared_normalized_track_title_for_matching,
     provider_metadata_evidence,
     resolution_failure,
     resolution_success,
@@ -941,14 +942,18 @@ def cover_art_url(release: dict | None) -> str | None:
     return _COVER_ART_ARCHIVE_FRONT_URL.format(release_id=release_id)
 
 
+def normalized_track_title_for_matching(value: str | None) -> str:
+    return shared_normalized_track_title_for_matching(value)
+
+
 def normalized_title_sequence(titles: list[str] | None) -> list[str]:
     if not titles:
         return []
 
     return [
-        normalized_title_for_matching(title)
+        normalized_track_title_for_matching(title)
         for title in titles
-        if normalized_title_for_matching(title)
+        if normalized_track_title_for_matching(title)
     ]
 
 

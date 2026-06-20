@@ -62,6 +62,21 @@ VERSION_WORDS = (
     "super deluxe",
     "version",
 )
+
+# A subset of VERSION_WORDS that denote a DIFFERENT recording (not just another
+# edition of the same recording). These must NOT be stripped when comparing
+# track titles for matching, otherwise "Angel (Mad Professor Remix)" would be
+# treated as identical to "Angel".
+RECORDING_VARIANT_WORDS = (
+    "remix",
+    "mix",
+    "live",
+    "acoustic",
+    "instrumental",
+    "demo",
+    "cover",
+    "dub",
+)
 _REMASTERED_SUFFIX_RE = re.compile(r"\s*[\(\[][^)\]]*\bremaster(?:ed)?\b[^)\]]*[\)\]]\s*", re.IGNORECASE)
 _FEATURE_SUFFIX_RE = re.compile(r"\s*[\(\[][^)\]]*\b(?:feat|ft)\.?(?:\s+[^)\]]*)?[\)\]]\s*", re.IGNORECASE)
 _PRODUCER_SUFFIX_RE = re.compile(r"\s*[\(\[][^)\]]*\bprod\.?(?:\s+by)?\s+[^)\]]*[\)\]]\s*", re.IGNORECASE)
@@ -239,6 +254,33 @@ def strip_version_suffixes(value: str) -> str:
         return part
 
     cleaned = re.sub(r"\([^)]*\)|\[[^]]*\]", replace_if_version, cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned.strip() or "Unknown"
+
+
+def strip_edition_suffixes(value: str) -> str:
+    """Like strip_version_suffixes but KEEPS "different recording" markers.
+
+    Edition markers (remaster/deluxe/edition/explicit/…) are removed so a deluxe
+    edition still matches the standard album, but recording variants
+    (remix/live/acoustic/instrumental/demo/cover/dub) are preserved so a remix or
+    live track is not treated as the original during title matching.
+    """
+    if not value:
+        return "Unknown"
+
+    cleaned = clean_string(value)
+
+    def replace_if_edition(match: re.Match[str]) -> str:
+        part = match.group(0)
+        lowered = part.lower()
+        if any(word in lowered for word in RECORDING_VARIANT_WORDS):
+            return part  # keep: this denotes a different recording
+        if any(word in lowered for word in VERSION_WORDS):
+            return " "
+        return part
+
+    cleaned = re.sub(r"\([^)]*\)|\[[^]]*\]", replace_if_edition, cleaned)
     cleaned = re.sub(r"\s+", " ", cleaned)
     return cleaned.strip() or "Unknown"
 

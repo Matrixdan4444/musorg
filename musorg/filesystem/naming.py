@@ -318,9 +318,15 @@ def format_output_destination(track: dict, root_output: str, settings: dict | No
     normalized = normalize_output_format_settings(settings)
     compatibility = normalize_filename_compatibility_settings(track.get("_filename_compatibility"))
     folder_segments = _album_folder_segments(track, normalized)
-    album_root = normalize_filesystem_path(
-        os.path.join(root_output, *[filesystem_safe_name_for_mode(segment, compatibility) for segment in folder_segments])
-    )
+    # The organize stage may pin a disambiguated album folder (when two distinct
+    # albums would otherwise resolve to the same path); honor it verbatim.
+    override = str(track.get("_album_root_override") or "").strip()
+    if override:
+        album_root = normalize_filesystem_path(override)
+    else:
+        album_root = normalize_filesystem_path(
+            os.path.join(root_output, *[filesystem_safe_name_for_mode(segment, compatibility) for segment in folder_segments])
+        )
     max_disc = _album_max_discnumber(track)
     disc_number = _disc_number(track)
     disc_folder = None

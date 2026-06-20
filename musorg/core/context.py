@@ -26,6 +26,7 @@ class Context:
         self.filename_compatibility = filename_compatibility
 
         self.files = []
+        self.cue_albums = []
         self.tracks = []
         self.albums = {}
         self.resolved_album_metadata = {}

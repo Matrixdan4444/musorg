@@ -39,6 +39,9 @@ from musorg.utils.debug import error, log
 _SESSION_DESTINATIONS = set()
 _SESSION_CLEANED_ALBUMS = set()
 _SESSION_WRITTEN_COVER_FILES = set()
+# Maps a claimed output album-folder -> the source album group that owns it, so
+# two DISTINCT albums that normalize to the same path don't merge into one folder.
+_SESSION_ALBUM_ROOTS: dict = {}
 # Guards the session sets above so concurrent organize runs in one process
 # (e.g. overlapping FastAPI requests) cannot corrupt duplicate-detection state.
 _SESSION_LOCK = threading.RLock()
@@ -49,7 +52,37 @@ def reset_session_state() -> None:
         _SESSION_DESTINATIONS.clear()
         _SESSION_CLEANED_ALBUMS.clear()
         _SESSION_WRITTEN_COVER_FILES.clear()
+        _SESSION_ALBUM_ROOTS.clear()
     reset_cover_download_cache()
+
+
+def claim_album_root(album_root: str, group_identity) -> str:
+    """Reserve an output album folder for one source album group.
+
+    Returns the folder unchanged if it is free or already owned by the same
+    group. If a DIFFERENT group already claimed it, append " (2)", " (3)", … to
+    the last path segment until a free path is found, so two distinct albums
+    never end up writing into the same folder.
+    """
+    album_root = normalize_filesystem_path(album_root)
+    with _SESSION_LOCK:
+        key = filesystem_path_key(album_root)
+        owner = _SESSION_ALBUM_ROOTS.get(key)
+        if owner is None or owner == group_identity:
+            _SESSION_ALBUM_ROOTS[key] = group_identity
+            return album_root
+
+        parent = os.path.dirname(album_root)
+        name = os.path.basename(album_root)
+        index = 2
+        while True:
+            candidate = normalize_filesystem_path(os.path.join(parent, f"{name} ({index})"))
+            candidate_key = filesystem_path_key(candidate)
+            existing = _SESSION_ALBUM_ROOTS.get(candidate_key)
+            if existing is None or existing == group_identity:
+                _SESSION_ALBUM_ROOTS[candidate_key] = group_identity
+                return candidate
+            index += 1
 
 
 def iter_audio_files(root_path: str) -> list[str]:
@@ -101,7 +134,12 @@ def preview_tag_changes(track: dict) -> list[str]:
 
 def preview_copy_track_to_destination(track: dict, destination: str) -> None:
     source_path = track["path"]
-    if source_path.lower().endswith(".flac"):
+    cue_start = track.get("_cue_start_seconds")
+    if cue_start is not None:
+        cue_end = track.get("_cue_end_seconds")
+        span = f"{float(cue_start):.2f}s..{float(cue_end):.2f}s" if cue_end is not None else f"{float(cue_start):.2f}s.."
+        log("DryRun", f"Would extract cue segment [{span}] from {source_path} -> {destination}", "📝")
+    elif source_path.lower().endswith(".flac"):
         log("DryRun", f"Would copy {source_path} -> {destination}", "📝")
     else:
         log("DryRun", f"Would transcode {source_path} -> {destination}", "📝")
@@ -129,9 +167,11 @@ def copy_track_to_destination(track: dict, destination: str, dry_run: bool = Fal
         preview_copy_track_to_destination(track, destination)
         return
 
+    cue_start = track.get("_cue_start_seconds")
+    cue_end = track.get("_cue_end_seconds")
     if run_report:
         with run_report.measure("audio_write"):
-            create_flac_file(track["path"], destination)
+            create_flac_file(track["path"], destination, cue_start, cue_end)
         with run_report.measure("tag_write"):
             write_metadata_tags(
                 destination,
@@ -140,7 +180,7 @@ def copy_track_to_destination(track: dict, destination: str, dry_run: bool = Fal
                 metadata_preservation_settings=metadata_settings,
             )
     else:
-        create_flac_file(track["path"], destination)
+        create_flac_file(track["path"], destination, cue_start, cue_end)
         write_metadata_tags(destination, track, metadata_preservation_settings=metadata_settings)
     if journal:
         journal.record(
@@ -276,6 +316,14 @@ def cleanup_existing_album_folders(
             if filesystem_path_key(candidate) == filesystem_path_key(target_folder) or not os.path.isdir(candidate):
                 continue
 
+            # Never remove a folder another album group already claimed in this
+            # run: two distinct editions with the same title (e.g. "Mezzanine"
+            # and "Mezzanine (2)") must not delete each other.
+            with _SESSION_LOCK:
+                claimed_by_other = filesystem_path_key(candidate) in _SESSION_ALBUM_ROOTS
+            if claimed_by_other:
+                continue
+
             if album_folder_title(folder_name) in safe_album_titles:
                 if dry_run:
                     if journal:
@@ -399,6 +447,7 @@ def organize_single_tracks(tracks: list[dict], root_output: str, dry_run: bool =
             ),
         )
 
+        staged_count = 0
         for index, track in enumerate(ordered_tracks, start=1):
             title = resolved_track_title(track)
             destination = os.path.join(
@@ -431,10 +480,17 @@ def organize_single_tracks(tracks: list[dict], root_output: str, dry_run: bool =
                     journal=journal,
                 )
                 copied += 1
-            except Exception:
-                if not dry_run:
-                    shutil.rmtree(staged_singles_folder, ignore_errors=True)
-                raise
+                staged_count += 1
+            except Exception as exc:
+                # One bad/unconvertible track must not abort the whole run.
+                error("Organize", f"Could not copy {track.get('path')}: {exc}")
+                continue
+
+        # Never replace an existing Singles folder with an empty staging dir:
+        # if nothing was staged and there is nothing to preserve, leave it as is.
+        if not dry_run and staged_count == 0 and not preserved_existing_files:
+            shutil.rmtree(staged_singles_folder, ignore_errors=True)
+            continue
 
         for existing_file in preserved_existing_files:
             if os.path.basename(existing_file).lower() == "cover.jpg":
@@ -450,9 +506,9 @@ def organize_single_tracks(tracks: list[dict], root_output: str, dry_run: bool =
             if not os.path.exists(destination):
                 try:
                     shutil.copy2(existing_file, destination)
-                except Exception:
-                    shutil.rmtree(staged_singles_folder, ignore_errors=True)
-                    raise
+                except Exception as exc:
+                    error("Organize", f"Could not preserve {existing_file}: {exc}")
+                    continue
 
         replace_directory(staged_singles_folder, singles_folder, dry_run=dry_run, journal=journal)
 

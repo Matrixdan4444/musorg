@@ -15,6 +15,7 @@ from musorg.metadata.normalizer import (
     strip_feature_suffix,
     strip_version_suffixes,
 )
+from musorg.metadata.cue import cue_track_tag_dicts
 from musorg.metadata.parser import read_tags
 from musorg.services.deezer import (
     deezer_page_release_date,
@@ -931,6 +932,33 @@ def fetch_musicbrainz_metadata_result(
     return resolution_success("musicbrainz", metadata, confidence=evidence_confidence(evidence), evidence=evidence)
 
 
+# Below this track-title-sequence score a candidate's tracks clearly do not
+# correspond to the source (e.g. a remix album that only shares the track
+# count), so the match is rejected rather than overwriting good source titles.
+DEEZER_TITLE_MATCH_REJECT_SCORE = 55
+_GENERIC_TITLE_RE = re.compile(r"^\s*(?:track|audio\s*track|untitled)?\s*\d*\s*$", re.IGNORECASE)
+
+
+def _source_titles_are_informative(titles) -> bool:
+    """True when the source has enough real track titles to compare against.
+
+    Poorly-tagged albums (numbers / "Track 01" / blanks) have nothing useful to
+    compare, so for those we must NOT reject a match for low title similarity.
+    """
+    if not titles:
+        return False
+    meaningful = 0
+    for title in titles:
+        text = str(title or "").strip()
+        if not text or text.lower() in {"unknown", "untitled"}:
+            continue
+        if _GENERIC_TITLE_RE.match(text):
+            continue
+        if any(char.isalpha() for char in text):
+            meaningful += 1
+    return meaningful >= max(1, len(titles) // 2)
+
+
 def resolve_album_metadata(
     payload: tuple[str, str, int, list[str], str | None, dict],
     total_albums: int,
@@ -971,6 +999,28 @@ def resolve_album_metadata(
     deezer_match = deezer_resolution_metadata(deezer_result)
     deezer_evidence = provider_metadata_evidence("deezer", deezer_match, lookup)
     deezer_confidence = evidence_confidence(deezer_evidence)
+
+    # Reject a candidate whose track titles do not correspond to the source
+    # (only the track count happened to match, e.g. a remix album). Applying it
+    # would overwrite real source titles with unrelated ones. Only reject when
+    # the source actually has informative titles to compare against.
+    if (
+        deezer_match
+        and deezer_evidence is not None
+        and _source_titles_are_informative(track_titles)
+        and deezer_evidence.track_title_sequence_score < DEEZER_TITLE_MATCH_REJECT_SCORE
+    ):
+        if is_developer_mode():
+            log(
+                "Metadata",
+                f"[DEV MODE] Rejecting Deezer match for {artist} - {album}: track titles do not "
+                f"align (seq={deezer_evidence.track_title_sequence_score:.0f})",
+                "🧪",
+            )
+        deezer_result = None
+        deezer_match = None
+        deezer_evidence = None
+        deezer_confidence = None
 
     validation_started_at = perf_counter()
     deezer_complete = deezer_album_metadata_complete(deezer_match)
@@ -1622,6 +1672,12 @@ def fill_missing_albumartist(track: dict, original_artist: str | None) -> None:
     track["albumartist"] = primary_artist(artist_val)
 
 
+def cue_album_track_tags(image_path, sheet):
+    """One read_tags-shaped dict per cue track for an image+cue album."""
+    base = read_tags(image_path)
+    return cue_track_tag_dicts(image_path, sheet, base_tags=base)
+
+
 def metadata_stage(context):
     tracks = []
     run_report = getattr(context, "run_report", None)
@@ -1641,6 +1697,17 @@ def metadata_stage(context):
             tracks.append(track)
         elif run_report:
             run_report.record_skipped_item(file, "Unreadable or unsupported audio metadata")
+
+    # Expand "image + cue" albums: one image file becomes N per-track entries.
+    for image_path, sheet in getattr(context, "cue_albums", []):
+        for tags in cue_album_track_tags(image_path, sheet):
+            source_album = tags.get("album")
+            track = normalize_track(tags)
+            override_key = filesystem_path_key(os.path.dirname(track.get("path", "")))
+            apply_staged_album_override(track, staged_album_overrides.get(override_key))
+            track["_source_album"] = source_album
+            track["_source_release_type_hint"] = release_type_hint_from_album(source_album)
+            tracks.append(track)
 
     grouped_tracks = {}
     for track in tracks:

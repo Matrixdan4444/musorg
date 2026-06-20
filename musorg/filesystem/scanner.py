@@ -2,7 +2,7 @@ import os
 
 from musorg.filesystem.naming import normalize_filesystem_text
 
-SUPPORTED_FORMATS = (".flac", ".wav", ".aiff", ".m4a")
+SUPPORTED_FORMATS = (".flac", ".wav", ".aiff", ".m4a", ".ape", ".wv", ".tta")
 
 def scan_files(root_path):
     files = []

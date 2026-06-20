@@ -7,6 +7,7 @@ from musorg.metadata.normalizer import (
     VERSION_WORDS,
     normalize_lookup_text as _normalize_lookup_text,
     normalize_lookup_text_for_matching,
+    strip_edition_suffixes,
     strip_producer_suffix,
     strip_version_suffixes,
 )
@@ -713,14 +714,24 @@ def build_deezer_track_query_plan(
     return plans
 
 
+def normalized_track_title_for_matching(value: str | None) -> str:
+    """Track-title normalizer that preserves remix/live/acoustic markers, so a
+    remix is not scored as identical to the original recording."""
+    cleaned = strip_edition_suffixes(value or "")
+    normalized = _normalize_lookup_text(cleaned)
+    if normalized:
+        return normalized
+    return _normalize_lookup_text(value or "")
+
+
 def normalized_title_sequence(titles: list[str] | tuple[str, ...] | None) -> list[str]:
     if not titles:
         return []
 
     return [
-        normalized_title_for_matching(title)
+        normalized_track_title_for_matching(title)
         for title in titles
-        if normalized_title_for_matching(title)
+        if normalized_track_title_for_matching(title)
     ]
 
 

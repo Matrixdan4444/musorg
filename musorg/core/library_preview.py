@@ -6,6 +6,7 @@ import re
 
 from musorg.core.cover_art import load_album_cover_bytes
 from musorg.filesystem.scanner import SUPPORTED_FORMATS
+from musorg.metadata.cue import cue_track_tag_dicts, detect_image_cue
 from musorg.metadata.parser import read_tags
 from musorg.utils.artist_text import first_known_artist, known_artist
 
@@ -74,7 +75,12 @@ def scan_album_previews(folder_path: str) -> list[AlbumPreview]:
         if not audio_files or current_path in seen_paths:
             continue
         seen_paths.add(current_path)
-        previews.append(_build_album_preview(root, current_path, audio_files))
+        cue = _cue_synthetic_tags(current_path)
+        if cue:
+            cue_paths, cue_tags = cue
+            previews.append(_build_album_preview(root, current_path, cue_paths, cue_tags))
+        else:
+            previews.append(_build_album_preview(root, current_path, audio_files))
 
     previews.sort(key=lambda item: (_sort_artist(item.artist_name), item.album_title.lower(), item.folder_path.lower()))
     return previews
@@ -118,7 +124,11 @@ def load_album_detail(folder_path: str, root_path: str | None = None) -> AlbumDe
             disc_number="",
             issues=("missing_track_numbers",),
         )
-    tags_by_path = _read_tags_map(flac_paths)
+    cue = _cue_synthetic_tags(folder)
+    if cue:
+        flac_paths, tags_by_path = cue
+    else:
+        tags_by_path = _read_tags_map(flac_paths)
     preview = _build_album_preview(root, folder, flac_paths, tags_by_path)
     tracks = [
         _build_track_preview(file_path, index + 1, tags_by_path.get(str(file_path)))
@@ -164,6 +174,37 @@ def issue_labels(issues: tuple[str, ...]) -> list[str]:
         "album_artist_inconsistency": "Album artist mismatch",
     }
     return [labels[issue] for issue in issues if issue in labels]
+
+
+def _cue_synthetic_tags(folder: Path) -> tuple[list[Path], dict[str, dict | None]] | None:
+    """For an image+cue album, return N synthetic per-track (paths, tags).
+
+    The single image file is expanded into one entry per cue track so the
+    existing preview builders show the real track list instead of one long
+    track. Synthetic paths are only used as map keys / fallback names — titles
+    and durations come from the cue tags.
+    """
+    try:
+        detected = detect_image_cue(folder)
+    except OSError:
+        return None
+    if not detected:
+        return None
+    image_path, sheet = detected
+    track_dicts = cue_track_tag_dicts(image_path, sheet, base_tags=read_tags(image_path))
+    if not track_dicts:
+        return None
+
+    paths: list[Path] = []
+    tags_by_path: dict[str, dict | None] = {}
+    for index, tags in enumerate(track_dicts, start=1):
+        number = str(tags.get("tracknumber") or index)
+        title = str(tags.get("title") or f"Track {number}")
+        safe_title = re.sub(r"[\\/]+", "_", title).strip() or f"Track {number}"
+        synthetic = folder / f"{number.zfill(2)} - {safe_title} [{index}].flac"
+        paths.append(synthetic)
+        tags_by_path[str(synthetic)] = tags
+    return paths, tags_by_path
 
 
 def _read_tags_map(flac_paths: list[Path]) -> dict[str, dict | None]:

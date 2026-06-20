@@ -81,6 +81,10 @@ def clean_library(request: CleanLibraryRequest | None = None) -> CleanLibraryRes
             tracksProcessed=result.tracks_processed,
             summaryPath=_clean_text(result.stats.get("summary_path")),
         )
+    except Exception as exc:
+        # The pipeline already logged the failure and published a run_failed
+        # event; surface a clean error to the client instead of a raw 500.
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     finally:
         finish_cleanup_run(started_run.run_id)
         if log_broadcaster.active_run_id() == started_run.run_id:
