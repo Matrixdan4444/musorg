@@ -1,5 +1,7 @@
 # musorg
 
+**English** | [Русский](README.ru.md)
+
 [![CI](https://github.com/Matrixdan4444/musorg/actions/workflows/ci.yml/badge.svg)](https://github.com/Matrixdan4444/musorg/actions/workflows/ci.yml)
 
 Desktop app for organizing a music library. It scans your folders, matches each
@@ -19,6 +21,18 @@ into a consistent `Artist/Album` structure.
 - **Batch editing** — edit metadata across many tracks at once.
 - **Library health checks** — flags albums with missing covers, unknown artists,
   missing track numbers, or inconsistent album artists.
+
+## Screenshots
+
+| | |
+|---|---|
+| Import & organize | ![Import](docs/screenshots_en/Import_en.png) |
+| Batch editing | ![Batch editing](docs/screenshots_en/Batch_Editing_en.png) |
+| Settings | ![Settings](docs/screenshots_en/Settings_en.png) |
+| Output folder format | ![Output folder format](docs/screenshots_en/Output_settings_en.png) |
+| Metadata preservation | ![Metadata preservation](docs/screenshots_en/Tags_settings_en.png) |
+| Duplicate handling | ![Duplicate handling](docs/screenshots_en/Duplicates_en.png) |
+| Library & output folders | ![Library and output folders](docs/screenshots_en/Input_Output_en.png) |
 
 ## Download (macOS)
 
