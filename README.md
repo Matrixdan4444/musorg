@@ -27,13 +27,21 @@ Download the latest `Musorg-*.dmg` from the
 drag **Musorg** into **Applications**.
 
 The app is **not signed with an Apple Developer ID**, so on first launch macOS
-Gatekeeper will block it — warning that it's from an "unidentified developer"
-or, on recent macOS, that the app "is damaged and can't be opened." This is
-expected for an open-source app distributed without a paid Apple certificate.
-To run it the first time, do **one** of the following:
+Gatekeeper will block it — warning that Apple "could not verify" the app, that
+it's from an "unidentified developer," or that it "is damaged and can't be
+opened." This is expected for an open-source app distributed without a paid
+Apple certificate. To run it the first time, do **one** of the following:
+
+- **System Settings → Privacy & Security** (recommended on macOS Sequoia and
+  later). Try to open `Musorg.app` once and dismiss the warning. Then open
+  **System Settings → Privacy & Security**, scroll to the **Security** section,
+  and next to *"Musorg" was blocked to protect your Mac* click **Open Anyway**.
+  Confirm with **Open Anyway** in the dialog that follows. macOS remembers the
+  choice afterwards.
 
 - **Right-click** (or Control-click) `Musorg.app` in Applications, choose
-  **Open**, then **Open** in the dialog. macOS remembers the choice afterwards.
+  **Open**, then **Open** in the dialog. (On older macOS; on Sequoia use the
+  Privacy & Security method above.)
 
 - Or remove the quarantine flag from Terminal, then open the app normally:
 
@@ -85,6 +93,22 @@ npm run build
 ```bash
 python -m musorg.desktop_webview
 ```
+
+## Package the macOS app
+
+Build `Musorg.app` and a drag-to-install `.dmg` (after the frontend build
+above). Bundling a static ffmpeg is optional — `packaging/fetch_ffmpeg.sh`
+fetches and checksum-verifies it; skip it for a FLAC-only build.
+
+```bash
+pip install pyinstaller dmgbuild
+packaging/fetch_ffmpeg.sh        # optional: bundle a static ffmpeg
+pyinstaller Musorg.spec          # -> dist/Musorg.app
+packaging/make_dmg.sh            # -> dist/Musorg-<version>.dmg
+```
+
+`make_dmg.sh` lays out the installer window with two large icons (Musorg.app
+and an Applications symlink) headlessly via `dmgbuild`, so it works in CI.
 
 ## Development
 
