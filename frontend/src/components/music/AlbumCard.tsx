@@ -19,8 +19,10 @@ function AlbumCardView({ album }: AlbumCardProps) {
     <article
       className={cn(
         "group grid grid-cols-[60px_minmax(0,1fr)] gap-3 rounded-2xl border border-border-soft/75 bg-surface-soft px-3 py-3 transition-[background-color,border-color] duration-150 ease-apple hover:border-[hsl(var(--accent-hue)_55%_50%)] hover:bg-surface-subtle",
-        album.selected && "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90",
         processingTone.container,
+        // Selection wins over the processing-state tone so a selected album
+        // always shows the accent color (not, e.g., the green "completed" tone).
+        album.selected && "border-[hsl(var(--accent-hue)_70%_60%)] bg-surface-selected/90",
       )}
     >
       <CoverImage

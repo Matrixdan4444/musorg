@@ -70,7 +70,7 @@ export function AppHeader({
               <ChevronDown className="ml-auto h-4 w-4 text-muted-foreground" />
             </motion.button>
             <button
-              className="app-button-secondary h-12 rounded-2xl px-4 text-[13px] transition"
+              className="app-button-secondary inline-flex h-12 items-center justify-center rounded-2xl px-4 text-[13px] transition"
               type="button"
               onClick={onRescan}
             >

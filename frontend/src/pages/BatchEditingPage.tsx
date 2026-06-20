@@ -3,12 +3,14 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, ReactNode } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { ModalPortal } from "@/components/ModalPortal";
 import { Panel } from "@/components/Panel";
 import { CoverImage } from "@/components/music/CoverImage";
 import { IssueBadge } from "@/components/music/IssueBadge";
 import { useBatchEditAlbumDetail } from "@/hooks/useBatchEditAlbumDetail";
 import { useBatchEditAlbums } from "@/hooks/useBatchEditAlbums";
 import { useLibrarySettings } from "@/hooks/useLibrarySettings";
+import { useI18n } from "@/i18n/useI18n";
 import {
   applyBatchEditRelease,
   bulkUpdateBatchEditAlbums,
@@ -57,6 +59,7 @@ const albumFieldOrder: Array<keyof BatchEditAlbumDraft> = [
 ];
 
 export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPageProps) {
+  const { t } = useI18n();
   const batchEditingActive = activePage === "batch-edit";
   const librarySettings = useLibrarySettings();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -167,7 +170,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
   }, [hasUnsavedChanges]);
 
   const displayedAlbumTitle = mergedAlbumDraft?.albumTitle || selectedDetail?.album.title || "";
-  const displayedAlbumArtist = resolveDisplayArtist(mergedAlbumDraft, selectedDetail);
+  const displayedAlbumArtist = resolveDisplayArtist(mergedAlbumDraft, selectedDetail) || t("common.unknownArtist");
   const currentCoverUrl = artworkDraft.mode === "remove"
     ? ""
     : artworkDraft.coverUrl || selectedDetail?.editor.artwork.coverUrl || selectedDetail?.album.coverUrl || "";
@@ -187,7 +190,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       });
       setRefreshKey((value) => value + 1);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Could not save batch edits.");
+      setPageError(err instanceof Error ? err.message : t("batchEditing.errors.save"));
     } finally {
       setSaving(false);
     }
@@ -206,7 +209,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
   }
 
   function guardNavigation(next: () => void) {
-    if (hasUnsavedChanges && !window.confirm("Discard unsaved batch edits?")) {
+    if (hasUnsavedChanges && !window.confirm(t("batchEditing.errors.discardConfirm"))) {
       return;
     }
     next();
@@ -287,7 +290,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       setPendingReleasePreview(null);
       setReleaseCandidates(payload.candidates);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Could not find releases.");
+      setPageError(err instanceof Error ? err.message : t("batchEditing.errors.findReleases"));
     } finally {
       setFindingRelease(false);
     }
@@ -306,7 +309,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       });
       setPendingReleasePreview(payload);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Could not preview the selected release.");
+      setPageError(err instanceof Error ? err.message : t("batchEditing.errors.previewRelease"));
     } finally {
       setPreviewingReleaseId(null);
     }
@@ -337,7 +340,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       });
       setArtworkOptions(payload.options);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Could not find provider artwork.");
+      setPageError(err instanceof Error ? err.message : t("batchEditing.errors.findArtwork"));
     } finally {
       setFindingArtwork(false);
     }
@@ -410,19 +413,19 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       setSelectedAlbumIds(new Set());
       setRefreshKey((value) => value + 1);
     } catch (err) {
-      setPageError(err instanceof Error ? err.message : "Could not apply bulk edits.");
+      setPageError(err instanceof Error ? err.message : t("batchEditing.errors.bulk"));
     } finally {
       setSaving(false);
     }
   }
 
   const sidebarStatus = albumsQuery.loading
-    ? "Loading albums..."
+    ? t("batchEditing.status.loading")
     : hasUnsavedChanges
-      ? "Unsaved changes"
-      : "Batch Editing ready";
+      ? t("batchEditing.status.unsaved")
+      : t("batchEditing.status.ready");
 
-  const libraryPath = librarySettings.data?.libraryRoot || albumsQuery.data?.libraryPath || "Choose library";
+  const libraryPath = librarySettings.data?.libraryRoot || albumsQuery.data?.libraryPath || t("batchEditing.chooseLibrary");
   const disconnectedLibrary = !librarySettings.loading && !!librarySettings.data?.isConfigured && !librarySettings.data?.isAvailable;
   const noLibrarySelected = !librarySettings.loading && !librarySettings.data?.isConfigured;
 
@@ -432,9 +435,9 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
         <header className="space-y-4 border-b border-border-soft/75 px-4 py-5 lg:px-8">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
             <div className="space-y-1">
-              <h1 className="text-[17px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">Batch Editing</h1>
+              <h1 className="text-[17px] font-semibold tracking-tight text-[hsl(var(--text-strong))]">{t("batchEditing.title")}</h1>
               <p className="text-[13px] text-muted-foreground">
-                Select an album, inspect it, repair the metadata, and save directly into the source files.
+                {t("batchEditing.subtitle")}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -443,16 +446,16 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                 type="button"
                 onClick={() => setRefreshKey((value) => value + 1)}
               >
-                Refresh
+                {t("batchEditing.refresh")}
               </button>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border-soft/75 bg-surface-subtle/85 px-4 py-3 text-[13px]">
             <span className="truncate text-[hsl(var(--text-base))]">{libraryPath}</span>
             <span className={noLibrarySelected ? "text-muted-foreground" : disconnectedLibrary ? "text-[hsl(var(--warning-fg))]" : "text-[hsl(var(--success-fg))]"}>
-              {noLibrarySelected ? "No library selected" : disconnectedLibrary ? "Disconnected" : "Connected"}
+              {noLibrarySelected ? t("batchEditing.noLibrarySelected") : disconnectedLibrary ? t("common.disconnected") : t("common.connected")}
             </span>
-            <span className="ml-auto text-muted-foreground">{filteredAlbums.length} albums</span>
+            <span className="ml-auto text-muted-foreground">{t("batchEditing.albumCount", { count: filteredAlbums.length })}</span>
           </div>
         </header>
       )}
@@ -470,7 +473,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
             <Search className="h-4 w-4 text-muted-foreground" />
             <input
               className="batch-input min-w-0 flex-1 border-0 bg-transparent px-0 py-0 ring-0 focus:ring-0"
-              placeholder="Search albums"
+              placeholder={t("batchEditing.list.searchPlaceholder")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
@@ -501,24 +504,24 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                     <p className="line-clamp-2 break-words text-[12px] leading-5 text-muted-foreground">{album.artist} • {album.year}</p>
                   </div>
                   <div className="flex min-w-0 flex-wrap gap-1.5">
-                    {album.processingState === "completed" ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="success" value="Completed" /> : null}
-                    {album.lowConfidence ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "low-confidence", label: "Low Confidence", severity: "warning" }} /> : null}
-                    {!album.coverUrl ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "missing-art", label: "Missing Artwork", severity: "warning" }} /> : null}
-                    {selectedAlbumId === album.id && hasUnsavedChanges ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="neutral" value="Metadata Modified" /> : null}
+                    {album.processingState === "completed" ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="success" value={t("batchEditing.badges.completed")} /> : null}
+                    {album.lowConfidence ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "low-confidence", label: t("batchEditing.badges.lowConfidence"), severity: "warning" }} /> : null}
+                    {!album.coverUrl ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="warning" issue={{ id: "missing-art", label: t("batchEditing.badges.missingArtwork"), severity: "warning" }} /> : null}
+                    {selectedAlbumId === album.id && hasUnsavedChanges ? <IssueBadge className="min-w-0 shrink whitespace-normal text-left" compact severity="neutral" value={t("batchEditing.badges.metadataModified")} /> : null}
                   </div>
                 </div>
               </button>
             ))}
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-border-soft/75 px-1 pt-3 text-[12px] text-muted-foreground">
-            <span>{selectedAlbumIds.size} selected</span>
+            <span>{t("batchEditing.list.selectedCount", { count: selectedAlbumIds.size })}</span>
             <button
               className="app-button-secondary rounded-xl px-3 py-2"
               type="button"
               disabled={selectedAlbumIds.size === 0}
               onClick={() => setBulkOpen(true)}
             >
-              Bulk Edit
+              {t("batchEditing.list.bulkEdit")}
             </button>
           </div>
         </Panel>
@@ -526,7 +529,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
         <Panel className="flex h-full min-h-0 flex-col overflow-hidden p-0 xl:min-h-[740px]">
           {!selectedDetail || !mergedAlbumDraft ? (
             <div className="flex h-full items-center justify-center p-8 text-[13px] text-muted-foreground">
-              Select an album to start editing.
+              {t("batchEditing.detail.selectPrompt")}
             </div>
           ) : (
             <div className="relative flex h-full min-h-0 flex-col">
@@ -541,10 +544,10 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                           <p className="break-words text-[14px] leading-6 text-muted-foreground">{displayedAlbumArtist}</p>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {selectedDetail.album.lowConfidence ? <IssueBadge compact severity="warning" issue={{ id: "low-confidence", label: "Low Confidence", severity: "warning" }} /> : null}
-                          {!selectedDetail.editor.artwork.hasArtwork ? <IssueBadge compact severity="warning" issue={{ id: "missing-art", label: "Missing Artwork", severity: "warning" }} /> : null}
-                          {artworkDirty ? <IssueBadge compact severity="neutral" value="Artwork Modified" /> : null}
-                          {releaseReplacementDraft ? <IssueBadge compact severity="success" value="Release Draft Applied" /> : null}
+                          {selectedDetail.album.lowConfidence ? <IssueBadge compact severity="warning" issue={{ id: "low-confidence", label: t("batchEditing.badges.lowConfidence"), severity: "warning" }} /> : null}
+                          {!selectedDetail.editor.artwork.hasArtwork ? <IssueBadge compact severity="warning" issue={{ id: "missing-art", label: t("batchEditing.badges.missingArtwork"), severity: "warning" }} /> : null}
+                          {artworkDirty ? <IssueBadge compact severity="neutral" value={t("batchEditing.badges.artworkModified")} /> : null}
+                          {releaseReplacementDraft ? <IssueBadge compact severity="success" value={t("batchEditing.badges.releaseDraftApplied")} /> : null}
                         </div>
                         <div className="flex flex-wrap gap-2">
                           <button
@@ -553,7 +556,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                             onClick={openArtworkDialog}
                           >
                             <ImagePlus className="h-3.5 w-3.5" />
-                            Replace Artwork
+                            {t("batchEditing.detail.replaceArtwork")}
                           </button>
                           <button
                             className={cn(
@@ -566,7 +569,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                             onClick={() => setReleaseDialogOpen(true)}
                           >
                             <Wand2 className="h-3.5 w-3.5" />
-                            Find Different Release
+                            {t("batchEditing.detail.findRelease")}
                           </button>
                         </div>
                       </div>
@@ -575,16 +578,16 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
 
                   <section className="space-y-3">
                     <SectionHeading
-                      title="Album Metadata"
-                      detail="Keep the most common album fixes visible at all times."
+                      title={t("batchEditing.albumMeta.heading")}
+                      detail={t("batchEditing.albumMeta.detail")}
                     />
                     <div className="grid gap-3 lg:grid-cols-2">
-                      <Field label="Album Title" dirty={dirtyAlbumFields.has("albumTitle")} value={mergedAlbumDraft.albumTitle} onChange={(value) => handleAlbumFieldChange("albumTitle", value)} />
-                      <Field label="Album Artist" dirty={dirtyAlbumFields.has("albumArtist")} value={mergedAlbumDraft.albumArtist} onChange={(value) => handleAlbumFieldChange("albumArtist", value)} />
-                      <Field label="Release Artist" dirty={dirtyAlbumFields.has("releaseArtist")} value={mergedAlbumDraft.releaseArtist} onChange={(value) => handleAlbumFieldChange("releaseArtist", value)} />
-                      <Field label="Year" dirty={dirtyAlbumFields.has("year")} value={mergedAlbumDraft.year} onChange={(value) => handleAlbumFieldChange("year", value)} />
-                      <Field label="Genre" dirty={dirtyAlbumFields.has("genre")} value={mergedAlbumDraft.genre} onChange={(value) => handleAlbumFieldChange("genre", value)} />
-                      <Field label="Release Type" dirty={dirtyAlbumFields.has("releaseType")} value={mergedAlbumDraft.releaseType} onChange={(value) => handleAlbumFieldChange("releaseType", value)} />
+                      <Field label={t("batchEditing.albumMeta.albumTitle")} dirty={dirtyAlbumFields.has("albumTitle")} value={mergedAlbumDraft.albumTitle} onChange={(value) => handleAlbumFieldChange("albumTitle", value)} />
+                      <Field label={t("batchEditing.albumMeta.albumArtist")} dirty={dirtyAlbumFields.has("albumArtist")} value={mergedAlbumDraft.albumArtist} onChange={(value) => handleAlbumFieldChange("albumArtist", value)} />
+                      <Field label={t("batchEditing.albumMeta.releaseArtist")} dirty={dirtyAlbumFields.has("releaseArtist")} value={mergedAlbumDraft.releaseArtist} onChange={(value) => handleAlbumFieldChange("releaseArtist", value)} />
+                      <Field label={t("batchEditing.albumMeta.year")} dirty={dirtyAlbumFields.has("year")} value={mergedAlbumDraft.year} onChange={(value) => handleAlbumFieldChange("year", value)} />
+                      <Field label={t("batchEditing.albumMeta.genre")} dirty={dirtyAlbumFields.has("genre")} value={mergedAlbumDraft.genre} onChange={(value) => handleAlbumFieldChange("genre", value)} />
+                      <Field label={t("batchEditing.albumMeta.releaseType")} dirty={dirtyAlbumFields.has("releaseType")} value={mergedAlbumDraft.releaseType} onChange={(value) => handleAlbumFieldChange("releaseType", value)} />
                     </div>
                   </section>
 
@@ -595,17 +598,17 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                       onClick={() => setAdvancedOpen((value) => !value)}
                     >
                       <div>
-                        <h3 className="text-[14px] font-semibold text-[hsl(var(--text-strong))]">Advanced Metadata</h3>
-                        <p className="mt-1 text-[12px] text-muted-foreground">Rarely used metadata stays available without crowding the main editor.</p>
+                        <h3 className="text-[14px] font-semibold text-[hsl(var(--text-strong))]">{t("batchEditing.advanced.heading")}</h3>
+                        <p className="mt-1 text-[12px] text-muted-foreground">{t("batchEditing.advanced.detail")}</p>
                       </div>
                       {advancedOpen ? <ChevronDown className="h-4 w-4 text-muted-foreground" /> : <ChevronRight className="h-4 w-4 text-muted-foreground" />}
                     </button>
                     {advancedOpen ? (
                       <div className="grid gap-3 rounded-2xl border border-border-soft/75 bg-surface-subtle/85 p-4 lg:grid-cols-2">
-                        <Field label="Label" dirty={dirtyAlbumFields.has("label")} value={mergedAlbumDraft.label} onChange={(value) => handleAlbumFieldChange("label", value)} />
-                        <Field label="Catalog Number" dirty={dirtyAlbumFields.has("catalogNumber")} value={mergedAlbumDraft.catalogNumber} onChange={(value) => handleAlbumFieldChange("catalogNumber", value)} />
-                        <Field label="Copyright" dirty={dirtyAlbumFields.has("copyright")} value={mergedAlbumDraft.copyright} onChange={(value) => handleAlbumFieldChange("copyright", value)} />
-                        <TextAreaField label="Comment" dirty={dirtyAlbumFields.has("comment")} value={mergedAlbumDraft.comment} onChange={(value) => handleAlbumFieldChange("comment", value)} />
+                        <Field label={t("batchEditing.advanced.label")} dirty={dirtyAlbumFields.has("label")} value={mergedAlbumDraft.label} onChange={(value) => handleAlbumFieldChange("label", value)} />
+                        <Field label={t("batchEditing.advanced.catalogNumber")} dirty={dirtyAlbumFields.has("catalogNumber")} value={mergedAlbumDraft.catalogNumber} onChange={(value) => handleAlbumFieldChange("catalogNumber", value)} />
+                        <Field label={t("batchEditing.advanced.copyright")} dirty={dirtyAlbumFields.has("copyright")} value={mergedAlbumDraft.copyright} onChange={(value) => handleAlbumFieldChange("copyright", value)} />
+                        <TextAreaField label={t("batchEditing.advanced.comment")} dirty={dirtyAlbumFields.has("comment")} value={mergedAlbumDraft.comment} onChange={(value) => handleAlbumFieldChange("comment", value)} />
                       </div>
                     ) : null}
                   </section>
@@ -613,8 +616,8 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                   {releaseReplacementDraft?.diff?.length ? (
                     <section className="space-y-3">
                       <SectionHeading
-                        title="Release Preview"
-                        detail="Review the staged release changes before saving them into the source files."
+                        title={t("batchEditing.releasePreview.heading")}
+                        detail={t("batchEditing.releasePreview.detail")}
                       />
                       <ReleaseDiffPreview rows={releaseReplacementDraft.diff} />
                     </section>
@@ -622,8 +625,8 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
 
                   <section className="space-y-3">
                     <SectionHeading
-                      title="Track Metadata"
-                      detail="Expand a track to edit it with full-width fields instead of a compressed spreadsheet."
+                      title={t("batchEditing.trackMeta.heading")}
+                      detail={t("batchEditing.trackMeta.detail")}
                     />
                     <div className="space-y-2">
                       {mergedTracks.map((track) => {
@@ -643,7 +646,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                                   <span className="shrink-0 text-[13px] font-semibold text-[hsl(var(--info-fg))]">{String(track.index).padStart(2, "0")}.</span>
                                   <span className="break-words text-[14px] font-medium text-[hsl(var(--text-strong))]">{track.title}</span>
-                                  {dirty ? <DirtyPill label="Modified" /> : null}
+                                  {dirty ? <DirtyPill label={t("batchEditing.badges.modified")} /> : null}
                                 </div>
                                 <p className="mt-1 break-words text-[12px] leading-5 text-muted-foreground">{track.artist}</p>
                               </div>
@@ -652,19 +655,19 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                                   {track.issues.map((issue) => <IssueBadge key={issue.id} compact issue={issue} />)}
                                 </div>
                               ) : (
-                                <span className="shrink-0 text-[11px] text-[hsl(var(--success-fg))]">OK</span>
+                                <span className="shrink-0 text-[11px] text-[hsl(var(--success-fg))]">{t("batchEditing.badges.ok")}</span>
                               )}
                             </button>
                             {expanded ? (
                               <div className="border-t border-border-soft/75 px-4 py-4">
                                 <div className="grid gap-3 lg:grid-cols-2">
-                                  <Field label="Title" value={track.title} onChange={(value) => handleTrackFieldChange(track.id, "title", value)} />
-                                  <Field label="Artist" value={track.artist} onChange={(value) => handleTrackFieldChange(track.id, "artist", value)} />
-                                  <Field label="Track Number" value={track.trackNumber} onChange={(value) => handleTrackFieldChange(track.id, "trackNumber", value)} />
-                                  <Field label="Disc Number" value={track.discNumber} onChange={(value) => handleTrackFieldChange(track.id, "discNumber", value)} />
-                                  <Field label="Genre" value={track.genre} onChange={(value) => handleTrackFieldChange(track.id, "genre", value)} />
-                                  <Field label="Album Artist" value={track.albumArtist} onChange={(value) => handleTrackFieldChange(track.id, "albumArtist", value)} />
-                                  <TextAreaField label="Comment" value={track.comment} onChange={(value) => handleTrackFieldChange(track.id, "comment", value)} />
+                                  <Field label={t("batchEditing.trackMeta.title")} value={track.title} onChange={(value) => handleTrackFieldChange(track.id, "title", value)} />
+                                  <Field label={t("batchEditing.trackMeta.artist")} value={track.artist} onChange={(value) => handleTrackFieldChange(track.id, "artist", value)} />
+                                  <Field label={t("batchEditing.trackMeta.trackNumber")} value={track.trackNumber} onChange={(value) => handleTrackFieldChange(track.id, "trackNumber", value)} />
+                                  <Field label={t("batchEditing.trackMeta.discNumber")} value={track.discNumber} onChange={(value) => handleTrackFieldChange(track.id, "discNumber", value)} />
+                                  <Field label={t("batchEditing.trackMeta.genre")} value={track.genre} onChange={(value) => handleTrackFieldChange(track.id, "genre", value)} />
+                                  <Field label={t("batchEditing.trackMeta.albumArtist")} value={track.albumArtist} onChange={(value) => handleTrackFieldChange(track.id, "albumArtist", value)} />
+                                  <TextAreaField label={t("batchEditing.trackMeta.comment")} value={track.comment} onChange={(value) => handleTrackFieldChange(track.id, "comment", value)} />
                                 </div>
                               </div>
                             ) : null}
@@ -682,8 +685,8 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                 <div className="sticky bottom-0 z-10 border-t border-border-soft/75 bg-panel/95 px-4 py-3 backdrop-blur-sm">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-[13px] font-semibold text-[hsl(var(--text-strong))]">Unsaved Changes</p>
-                      <p className="text-[12px] text-muted-foreground">Changes are staged locally and will not be written until you press Save.</p>
+                      <p className="text-[13px] font-semibold text-[hsl(var(--text-strong))]">{t("batchEditing.unsaved.title")}</p>
+                      <p className="text-[12px] text-muted-foreground">{t("batchEditing.unsaved.detail")}</p>
                     </div>
                     <div className="flex gap-2">
                       <button
@@ -691,7 +694,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                         type="button"
                         onClick={handleReset}
                       >
-                        Discard
+                        {t("batchEditing.unsaved.discard")}
                       </button>
                       <button
                         className="app-button-primary rounded-2xl px-4 py-2 text-[13px] font-semibold"
@@ -699,7 +702,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                         disabled={saving}
                         onClick={() => void handleSave()}
                       >
-                        {saving ? "Saving..." : "Save"}
+                        {saving ? t("batchEditing.unsaved.saving") : t("batchEditing.unsaved.save")}
                       </button>
                     </div>
                   </div>
@@ -711,11 +714,11 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       </div>
 
       {releaseDialogOpen ? (
-        <Dialog onClose={() => setReleaseDialogOpen(false)} title="Find Different Release">
+        <Dialog onClose={() => setReleaseDialogOpen(false)} title={t("batchEditing.releaseDialog.title")}>
           <div className="space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
-              <Field label="Artist" value={releaseQueryArtist} onChange={setReleaseQueryArtist} />
-              <Field label="Album" value={releaseQueryAlbum} onChange={setReleaseQueryAlbum} />
+              <Field label={t("batchEditing.releaseDialog.artist")} value={releaseQueryArtist} onChange={setReleaseQueryArtist} />
+              <Field label={t("batchEditing.releaseDialog.album")} value={releaseQueryAlbum} onChange={setReleaseQueryAlbum} />
             </div>
             <button
               className="app-button-primary rounded-2xl px-4 py-2 text-[13px] font-semibold"
@@ -723,7 +726,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
               disabled={findingRelease}
               onClick={() => void handleFindRelease()}
             >
-              {findingRelease ? "Searching..." : "Search Deezer + MusicBrainz"}
+              {findingRelease ? t("batchEditing.releaseDialog.searching") : t("batchEditing.releaseDialog.search")}
             </button>
 
             {pendingReleasePreview ? (
@@ -734,7 +737,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                     <h4 className="break-words text-[15px] font-semibold text-[hsl(var(--text-strong))]">{pendingReleasePreview.candidate.title}</h4>
                     <p className="break-words text-[12px] text-muted-foreground">{pendingReleasePreview.candidate.artist}</p>
                     <p className="text-[11px] text-muted-foreground">
-                      {pendingReleasePreview.candidate.year} • {pendingReleasePreview.candidate.trackCount} tracks • {pendingReleasePreview.candidate.provider}
+                      {pendingReleasePreview.candidate.year} • {t("batchEditing.releaseDialog.tracks", { count: pendingReleasePreview.candidate.trackCount })} • {pendingReleasePreview.candidate.provider}
                     </p>
                   </div>
                 </div>
@@ -745,14 +748,14 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                     type="button"
                     onClick={() => setPendingReleasePreview(null)}
                   >
-                    Back to Results
+                    {t("batchEditing.releaseDialog.backToResults")}
                   </button>
                   <button
                     className="app-button-primary rounded-2xl px-4 py-2 text-[13px] font-semibold"
                     type="button"
                     onClick={handleApplyReleasePreview}
                   >
-                    Apply Release
+                    {t("batchEditing.releaseDialog.applyRelease")}
                   </button>
                 </div>
               </div>
@@ -771,13 +774,13 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                   <div className="min-w-0">
                     <h4 className="break-words text-[13px] font-semibold text-[hsl(var(--text-strong))]">{candidate.title}</h4>
                     <p className="break-words text-[12px] text-muted-foreground">{candidate.artist}</p>
-                    <p className="text-[11px] text-muted-foreground">{candidate.year} • {candidate.trackCount} tracks • {candidate.provider}</p>
+                    <p className="text-[11px] text-muted-foreground">{candidate.year} • {t("batchEditing.releaseDialog.tracks", { count: candidate.trackCount })} • {candidate.provider}</p>
                     {formatArtworkResolution(candidate.artworkWidth, candidate.artworkHeight) ? (
-                      <p className="mt-1 text-[11px] text-[hsl(var(--info-fg))]">Artwork {formatArtworkResolution(candidate.artworkWidth, candidate.artworkHeight)}</p>
+                      <p className="mt-1 text-[11px] text-[hsl(var(--info-fg))]">{t("batchEditing.releaseDialog.artworkRes", { res: formatArtworkResolution(candidate.artworkWidth, candidate.artworkHeight) ?? "" })}</p>
                     ) : null}
                   </div>
                   <div className="flex items-center justify-end text-[12px] text-[hsl(var(--success-fg))]">
-                    {previewingReleaseId === candidate.id ? "Loading..." : "Preview"}
+                    {previewingReleaseId === candidate.id ? t("batchEditing.releaseDialog.loading") : t("batchEditing.releaseDialog.preview")}
                   </div>
                 </button>
               ))}
@@ -787,7 +790,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       ) : null}
 
       {artworkDialogOpen ? (
-        <Dialog onClose={() => setArtworkDialogOpen(false)} title="Artwork Source">
+        <Dialog onClose={() => setArtworkDialogOpen(false)} title={t("batchEditing.artworkDialog.title")}>
           <div className="space-y-4">
             <div className="inline-flex rounded-2xl border border-border-soft/75 bg-surface-subtle/85 p-1">
               <button
@@ -800,21 +803,21 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                   }
                 }}
               >
-                Provider Artwork
+                {t("batchEditing.artworkDialog.providerTab")}
               </button>
               <button
                 className={cn("rounded-[14px] px-3 py-2 text-[12px] transition", artworkTab === "local" ? "bg-surface-strong text-[hsl(var(--text-strong))]" : "text-muted-foreground")}
                 type="button"
                 onClick={() => setArtworkTab("local")}
               >
-                Local File
+                {t("batchEditing.artworkDialog.localTab")}
               </button>
             </div>
 
             {artworkTab === "provider" ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border-soft/75 bg-surface-subtle/85 px-4 py-3 text-[12px] text-muted-foreground">
-                  <span>Searching providers for</span>
+                  <span>{t("batchEditing.artworkDialog.searchingFor")}</span>
                   <span className="text-[hsl(var(--text-strong))]">{displayedAlbumArtist}</span>
                   <span>•</span>
                   <span className="text-[hsl(var(--text-strong))]">{displayedAlbumTitle}</span>
@@ -824,7 +827,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                     disabled={findingArtwork}
                     onClick={() => void handleFindArtwork()}
                   >
-                    {findingArtwork ? "Searching..." : "Refresh"}
+                    {findingArtwork ? t("batchEditing.artworkDialog.searching") : t("batchEditing.artworkDialog.refresh")}
                   </button>
                 </div>
                 <div className="space-y-2">
@@ -835,18 +838,18 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                       type="button"
                       onClick={() => applyProviderArtwork(option)}
                     >
-                      <CoverImage alt={option.releaseTitle || "Artwork option"} className="h-[88px] w-[88px] rounded-2xl" compact src={option.coverUrl} />
+                      <CoverImage alt={option.releaseTitle || t("batchEditing.artworkDialog.option")} className="h-[88px] w-[88px] rounded-2xl" compact src={option.coverUrl} />
                       <div className="min-w-0 space-y-1">
                         <p className="text-[13px] font-semibold text-[hsl(var(--text-strong))]">{option.provider === "musicbrainz" ? "MusicBrainz" : "Deezer"}</p>
                         <p className="break-words text-[12px] text-muted-foreground">{option.releaseTitle || displayedAlbumTitle}</p>
-                        <p className="text-[11px] text-[hsl(var(--info-fg))]">{formatArtworkResolution(option.width, option.height) || "Resolution unavailable"}</p>
+                        <p className="text-[11px] text-[hsl(var(--info-fg))]">{formatArtworkResolution(option.width, option.height) || t("batchEditing.artworkDialog.resolutionUnavailable")}</p>
                       </div>
-                      <div className="flex items-center justify-end text-[12px] text-[hsl(var(--success-fg))]">Apply</div>
+                      <div className="flex items-center justify-end text-[12px] text-[hsl(var(--success-fg))]">{t("batchEditing.artworkDialog.apply")}</div>
                     </button>
                   ))}
                   {!findingArtwork && artworkOptions.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-border-soft/75 px-4 py-6 text-center text-[12px] text-muted-foreground">
-                      No provider artwork found for the current album metadata.
+                      {t("batchEditing.artworkDialog.noArtwork")}
                     </div>
                   ) : null}
                 </div>
@@ -872,8 +875,8 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                   onDrop={handleArtworkDrop}
                 >
                   <Upload className="h-5 w-5 text-[hsl(var(--info-fg))]" />
-                  <p className="text-[13px] font-medium text-[hsl(var(--text-strong))]">Drag artwork here or choose a file</p>
-                  <p className="text-[12px] text-muted-foreground">PNG, JPG, and WebP previews are applied as draft artwork until you save.</p>
+                  <p className="text-[13px] font-medium text-[hsl(var(--text-strong))]">{t("batchEditing.artworkDialog.dragPrompt")}</p>
+                  <p className="text-[12px] text-muted-foreground">{t("batchEditing.artworkDialog.dragHint")}</p>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -884,8 +887,8 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                 />
                 {artworkDraft.mode === "upload" && artworkDraft.coverUrl ? (
                   <div className="rounded-2xl border border-border-soft/75 bg-surface-subtle/85 p-4">
-                    <p className="mb-3 text-[12px] text-muted-foreground">{artworkDraft.filename || "Selected file"}</p>
-                    <CoverImage alt="Uploaded artwork preview" className="h-[180px] w-[180px] rounded-[24px]" src={artworkDraft.coverUrl} />
+                    <p className="mb-3 text-[12px] text-muted-foreground">{artworkDraft.filename || t("batchEditing.artworkDialog.selectedFile")}</p>
+                    <CoverImage alt={t("batchEditing.artworkDialog.uploadedPreview")} className="h-[180px] w-[180px] rounded-[24px]" src={artworkDraft.coverUrl} />
                   </div>
                 ) : null}
               </div>
@@ -897,14 +900,14 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
                 type="button"
                 onClick={() => setArtworkDraft({ mode: "remove" })}
               >
-                Remove Artwork
+                {t("batchEditing.artworkDialog.removeArtwork")}
               </button>
               <button
                 className="app-button-secondary rounded-2xl px-4 py-2 text-[13px]"
                 type="button"
                 onClick={() => setArtworkDialogOpen(false)}
               >
-                Done
+                {t("batchEditing.artworkDialog.done")}
               </button>
             </div>
           </div>
@@ -912,15 +915,15 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
       ) : null}
 
       {bulkOpen ? (
-        <Dialog onClose={() => setBulkOpen(false)} title="Bulk Edit Albums">
+        <Dialog onClose={() => setBulkOpen(false)} title={t("batchEditing.bulkDialog.title")}>
           <div className="space-y-3">
-            <p className="text-[12px] text-muted-foreground">{selectedAlbumIds.size} albums selected</p>
+            <p className="text-[12px] text-muted-foreground">{t("batchEditing.bulkDialog.selectedCount", { count: selectedAlbumIds.size })}</p>
             <div className="grid gap-3 md:grid-cols-2">
-              <Field label="Album Artist" value={bulkDraft.albumArtist} onChange={(value) => setBulkDraft((current) => ({ ...current, albumArtist: value }))} />
-              <Field label="Year" value={bulkDraft.year} onChange={(value) => setBulkDraft((current) => ({ ...current, year: value }))} />
-              <Field label="Genre" value={bulkDraft.genre} onChange={(value) => setBulkDraft((current) => ({ ...current, genre: value }))} />
-              <Field label="Release Type" value={bulkDraft.releaseType} onChange={(value) => setBulkDraft((current) => ({ ...current, releaseType: value }))} />
-              <TextAreaField label="Comment" value={bulkDraft.comment} onChange={(value) => setBulkDraft((current) => ({ ...current, comment: value }))} />
+              <Field label={t("batchEditing.bulkDialog.albumArtist")} value={bulkDraft.albumArtist} onChange={(value) => setBulkDraft((current) => ({ ...current, albumArtist: value }))} />
+              <Field label={t("batchEditing.bulkDialog.year")} value={bulkDraft.year} onChange={(value) => setBulkDraft((current) => ({ ...current, year: value }))} />
+              <Field label={t("batchEditing.bulkDialog.genre")} value={bulkDraft.genre} onChange={(value) => setBulkDraft((current) => ({ ...current, genre: value }))} />
+              <Field label={t("batchEditing.bulkDialog.releaseType")} value={bulkDraft.releaseType} onChange={(value) => setBulkDraft((current) => ({ ...current, releaseType: value }))} />
+              <TextAreaField label={t("batchEditing.bulkDialog.comment")} value={bulkDraft.comment} onChange={(value) => setBulkDraft((current) => ({ ...current, comment: value }))} />
             </div>
             <button
               className="app-button-primary rounded-2xl px-4 py-2 text-[13px] font-semibold"
@@ -928,7 +931,7 @@ export function BatchEditingPage({ activePage, onNavigate }: BatchEditingPagePro
               disabled={saving}
               onClick={() => void handleBulkApply()}
             >
-              {saving ? "Applying..." : "Apply Bulk Metadata"}
+              {saving ? t("batchEditing.bulkDialog.applying") : t("batchEditing.bulkDialog.apply")}
             </button>
           </div>
         </Dialog>
@@ -1038,17 +1041,19 @@ function Dialog({
   onClose: () => void;
 }) {
   return (
-    <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-5">
-      <div className="w-full max-w-[920px] rounded-[28px] border border-border-soft/80 bg-panel p-5 shadow-panel">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-[16px] font-semibold text-[hsl(var(--text-strong))]">{title}</h3>
-          <button className="rounded-full px-3 py-1 text-[13px] text-muted-foreground" type="button" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </button>
+    <ModalPortal>
+      <div className="app-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-5">
+        <div className="w-full max-w-[920px] rounded-[28px] border border-border-soft/80 bg-panel p-5 shadow-panel">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-[16px] font-semibold text-[hsl(var(--text-strong))]">{title}</h3>
+            <button className="rounded-full px-3 py-1 text-[13px] text-muted-foreground" type="button" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
       </div>
-    </div>
+    </ModalPortal>
   );
 }
 
@@ -1099,7 +1104,7 @@ function resolveDisplayArtist(
     selectedDetail?.editor.album.releaseArtist,
     selectedDetail?.album.albumArtist,
     selectedDetail?.album.artist,
-  ].find((value) => value && value.trim()) || "Unknown artist";
+  ].find((value) => value && value.trim()) || "";
 }
 
 function formatArtworkResolution(width?: number | null, height?: number | null) {
