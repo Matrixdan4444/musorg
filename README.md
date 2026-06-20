@@ -8,7 +8,7 @@ Desktop app for organizing a music library. It scans your folders, matches each
 album against online databases, cleans up the metadata, and lays the files out
 into a consistent `Artist/Album` structure.
 
-![Musorg](docs/ui-reference/current_ui_reference.png)
+![Musorg](docs/screenshots_en/Import_en.png)
 
 ## Features
 
