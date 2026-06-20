@@ -92,6 +92,7 @@ export const en = {
       none: "None",
     },
     notConfigured: "Not configured",
+    workspaceReady: "Workspace ready",
     clearCacheTitle: "Clear Cache",
     clearCacheDescription: "Clears saved provider decisions so Musorg can evaluate the same release again from scratch.",
     clearCacheAction: "Clear Cache",

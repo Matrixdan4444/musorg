@@ -91,6 +91,7 @@ export const ru: LocaleShape<typeof en> = {
       none: "Нет",
     },
     notConfigured: "Не настроено",
+    workspaceReady: "Рабочее пространство готово",
     clearCacheTitle: "Очистить кэш",
     clearCacheDescription: "Очищает сохраненные решения провайдеров, чтобы Musorg мог заново проверить тот же релиз.",
     clearCacheAction: "Очистить кэш",

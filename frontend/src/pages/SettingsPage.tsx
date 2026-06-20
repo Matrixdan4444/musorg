@@ -64,16 +64,14 @@ export function SettingsPage({ activePage, onNavigate }: SettingsPageProps) {
   const { data: albumsPayload } = useAlbums(0, developerMode, settingsActive);
   const previewAlbumId = settingsActive ? albumsPayload?.albums[0]?.id ?? null : null;
   const { data: previewAlbumDetail } = useAlbumDetail(previewAlbumId, 0, developerMode, settingsActive);
-  const statusLabel = developerMode ? t("settings.developerModeEnabled") : t("settings.developerModeDisabled");
+  const statusLabel = librarySettings.data?.libraryRoot
+    ? t("settings.workspaceReady")
+    : t("settings.notConfigured");
   const sourceLabel = {
     environment: t("settings.sourceValues.environment"),
     settings: t("settings.sourceValues.settings"),
     none: t("settings.sourceValues.none"),
   }[librarySettings.data?.source ?? "none"];
-
-  async function handleToggleDeveloperMode() {
-    await librarySettings.saveDeveloperMode(!developerMode);
-  }
 
   async function handleLanguageChange(nextLanguage: LanguageCode) {
     const previousLanguage = language;
@@ -232,49 +230,30 @@ export function SettingsPage({ activePage, onNavigate }: SettingsPageProps) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1">
-                  <h3 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.developerModeTitle")}</h3>
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.clearCacheTitle")}</h4>
+                    <span
+                      className="inline-flex h-[18px] w-[18px] cursor-help items-center justify-center rounded-full border border-border-soft/75 bg-surface-soft/70 text-[11px] font-semibold text-muted-foreground"
+                      tabIndex={0}
+                      role="img"
+                      aria-label={t("settings.clearCacheDescription")}
+                      title={t("settings.clearCacheDescription")}
+                    >
+                      ?
+                    </span>
+                  </div>
                   <p className="max-w-[560px] text-[13px] leading-6 text-muted-foreground">
-                    {t("settings.developerModeDescription")}
-                  </p>
-                </div>
-
-                <button
-                  className={cn(
-                    "inline-flex h-11 min-w-[150px] items-center justify-center rounded-2xl px-4 text-[13px] font-semibold transition",
-                    developerMode
-                      ? "app-button-primary"
-                      : "app-button-secondary",
-                  )}
-                  type="button"
-                  role="switch"
-                  aria-checked={developerMode}
-                  onClick={handleToggleDeveloperMode}
-                  disabled={librarySettings.loading || librarySettings.saving}
-                >
-                  {librarySettings.saving ? t("common.saving") : developerMode ? t("settings.enabled") : t("settings.disabled")}
-                </button>
-              </div>
-
-              <div className="flex flex-col gap-3 border-t border-border-soft/75 pt-4 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-1">
-                  <h4 className="text-[13px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.clearCacheTitle")}</h4>
-                  <p className="max-w-[560px] text-[12px] leading-5 text-muted-foreground">
                     {t("settings.clearCacheDescription")}
                   </p>
                 </div>
 
                 <button
-                  className={cn(
-                    "inline-flex h-10 min-w-[140px] items-center justify-center rounded-2xl px-4 text-[13px] font-semibold transition",
-                    developerMode
-                      ? "app-button-secondary"
-                      : "cursor-not-allowed border border-border-soft/60 bg-surface-soft/70 text-muted-foreground/60",
-                  )}
+                  className="app-button-secondary inline-flex h-11 min-w-[150px] items-center justify-center rounded-2xl px-4 text-[13px] font-semibold transition"
                   type="button"
                   onClick={handleClearCache}
-                  disabled={!developerMode || librarySettings.clearingCache}
+                  disabled={librarySettings.clearingCache}
                 >
                   {librarySettings.clearingCache ? t("common.clearing") : t("settings.clearCacheAction")}
                 </button>
