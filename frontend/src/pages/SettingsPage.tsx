@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import type { CSSProperties } from "react";
+import { FieldHelp } from "@/components/FieldHelp";
 import { Panel } from "@/components/Panel";
 import { DuplicateHandlingCard } from "@/components/settings/DuplicateHandlingCard";
 import { FilenameCompatibilityCard } from "@/components/settings/FilenameCompatibilityCard";
@@ -231,22 +232,9 @@ export function SettingsPage({ activePage, onNavigate }: SettingsPageProps) {
               </div>
 
               <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    <h4 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.clearCacheTitle")}</h4>
-                    <span
-                      className="inline-flex h-[18px] w-[18px] cursor-help items-center justify-center rounded-full border border-border-soft/75 bg-surface-soft/70 text-[11px] font-semibold text-muted-foreground"
-                      tabIndex={0}
-                      role="img"
-                      aria-label={t("settings.clearCacheDescription")}
-                      title={t("settings.clearCacheDescription")}
-                    >
-                      ?
-                    </span>
-                  </div>
-                  <p className="max-w-[560px] text-[13px] leading-6 text-muted-foreground">
-                    {t("settings.clearCacheDescription")}
-                  </p>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.clearCacheTitle")}</h3>
+                  <FieldHelp label={t("settings.clearCacheTitle")} description={t("settings.clearCacheDescription")} />
                 </div>
 
                 <button
