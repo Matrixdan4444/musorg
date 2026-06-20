@@ -1,0 +1,18 @@
+Musorg bundles a static build of FFmpeg to transcode non-FLAC audio sources
+(e.g. .wav / .aiff / .m4a) to FLAC during organization.
+
+FFmpeg version: 8.1.1 (static, macOS arm64)
+Build configuration: --enable-gpl --enable-version3 (no nonfree components)
+
+FFmpeg is free software licensed under the GNU General Public License version 3
+(GPLv3). The full license text is in COPYING.GPLv3 alongside this file.
+
+Musorg invokes FFmpeg as a separate command-line program (via subprocess); it
+does not link against FFmpeg's libraries. Musorg itself is licensed under the
+MIT License — see the LICENSE file at the root of the project.
+
+FFmpeg source code is available from:
+  https://ffmpeg.org/download.html
+
+This particular prebuilt static macOS build was produced by:
+  https://ffmpeg.martin-riedl.de

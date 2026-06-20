@@ -28,3 +28,6 @@ test/results/
 .agents/
 .cursorrules
 skills-lock.json
+
+# Bundled ffmpeg binary (fetched via packaging/fetch_ffmpeg.sh, not committed)
+packaging/bin/
