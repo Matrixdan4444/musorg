@@ -29,7 +29,7 @@ class ApiRuntimeConfig:
 def create_app(runtime_config: ApiRuntimeConfig | None = None) -> FastAPI:
     config = runtime_config or ApiRuntimeConfig()
 
-    app = FastAPI(title="Musorg Local API", version="0.1.0")
+    app = FastAPI(title="Musorg Local API", version="0.2.0")
     app.state.runtime_config = config
 
     if config.allow_origins:
