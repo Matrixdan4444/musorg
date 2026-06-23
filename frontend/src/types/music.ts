@@ -442,6 +442,8 @@ export interface LibrarySettingsPayload {
   filenameCompatibility: FilenameCompatibilityMode;
   outputFormat: OutputFormatSettings;
   metadataPreservation: MetadataPreservationSettings;
+  onboardingCompleted: boolean;
+  onboardingDismissed: boolean;
   isConfigured: boolean;
   isAvailable: boolean;
   source: "settings" | "environment" | "none";
@@ -461,6 +463,8 @@ export interface UpdateLibrarySettingsPayload {
   filenameCompatibility: FilenameCompatibilityMode;
   outputFormat: OutputFormatSettings;
   metadataPreservation: MetadataPreservationSettings;
+  onboardingCompleted?: boolean | null;
+  onboardingDismissed?: boolean | null;
 }
 
 export interface OutputFormatSettings {

@@ -20,6 +20,7 @@ import type { AccentColor, LanguageCode, ThemeMode } from "@/types/music";
 interface SettingsPageProps {
   activePage: AppPage;
   onNavigate: (page: AppPage) => void;
+  onOpenTidyHelper: () => void;
 }
 
 interface SwatchStyle extends CSSProperties {
@@ -56,7 +57,7 @@ const ACCENT_OPTIONS: Array<{
   { value: "rose", labelKey: "settings.accentColorOptions.rose", previewStyle: { "--swatch-ring": "344 78% 60%", "--swatch-fill": "354 88% 70%", "--swatch-glow": "12 90% 72%" } },
 ];
 
-export function SettingsPage({ activePage, onNavigate }: SettingsPageProps) {
+export function SettingsPage({ activePage, onNavigate, onOpenTidyHelper }: SettingsPageProps) {
   const { language, setLanguage, t } = useI18n();
   const { themeMode, accentColor, setThemeMode, setAccentColor } = useTheme();
   const librarySettings = useLibrarySettings();
@@ -159,6 +160,23 @@ export function SettingsPage({ activePage, onNavigate }: SettingsPageProps) {
 
           <div className="rounded-3xl border border-border-soft/75 bg-surface-subtle/85 p-5">
             <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3 border-b border-border-soft/75 pb-4 md:flex-row md:items-center md:justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.tidyHelperTitle")}</h3>
+                  <p className="max-w-[560px] text-[13px] leading-6 text-muted-foreground">
+                    {t("settings.tidyHelperDescription")}
+                  </p>
+                </div>
+
+                <button
+                  className="app-button-primary inline-flex h-11 min-w-[170px] items-center justify-center rounded-2xl px-4 text-[13px] font-semibold transition"
+                  type="button"
+                  onClick={onOpenTidyHelper}
+                >
+                  {t("settings.tidyHelperAction")}
+                </button>
+              </div>
+
               <div className="flex flex-col gap-4 border-b border-border-soft/75 pb-4 md:flex-row md:items-center md:justify-between">
                 <div className="space-y-1">
                   <h3 className="text-[15px] font-semibold text-[hsl(var(--text-strong))]">{t("settings.languageTitle")}</h3>

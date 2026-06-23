@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { getLibrarySettings } from "@/lib/api/music";
+import { InitialSetupWizard } from "@/components/onboarding/InitialSetupWizard";
 import { BatchEditingPage } from "@/pages/BatchEditingPage";
 import { ImportAlbumsPage } from "@/pages/ImportAlbumsPage";
 import { SettingsPage } from "@/pages/SettingsPage";
@@ -8,6 +9,7 @@ import { getRuntimeConfig } from "@/lib/runtime";
 import { useI18n } from "@/i18n/useI18n";
 import { useTheme } from "@/theme/useTheme";
 import type { AppPage } from "@/types/layout";
+import type { LibrarySettingsPayload } from "@/types/music";
 
 
 function StartupScreen({
@@ -63,6 +65,8 @@ function AppContent() {
   const [error, setError] = useState<string | null>(null);
   const [attempt, setAttempt] = useState(0);
   const [page, setPage] = useState<AppPage>("import");
+  const [settingsSnapshot, setSettingsSnapshot] = useState<LibrarySettingsPayload | null>(null);
+  const [wizardSource, setWizardSource] = useState<"startup" | "settings" | null>(null);
   const [visitedPages, setVisitedPages] = useState<Record<AppPage, boolean>>({
     import: true,
     "batch-edit": false,
@@ -99,11 +103,15 @@ function AppContent() {
           }
 
           if (!cancelled) {
+            setSettingsSnapshot(settings);
             setLanguage(settings.language);
             setAppearance({
               themeMode: settings.themeMode,
               accentColor: settings.accentColor,
             });
+            if (runtime.forceSetupWizard || (!settings.onboardingCompleted && !settings.onboardingDismissed)) {
+              setWizardSource("startup");
+            }
             setReady(true);
           }
           return;
@@ -156,6 +164,32 @@ function AppContent() {
     );
   }
 
+  if (wizardSource) {
+    return (
+      <InitialSetupWizard
+        entrySource={wizardSource}
+        onExit={(reason, payload) => {
+          if (payload) {
+            setSettingsSnapshot(payload);
+          } else if (settingsSnapshot) {
+            setSettingsSnapshot({
+              ...settingsSnapshot,
+              onboardingCompleted: reason === "finish" ? true : settingsSnapshot.onboardingCompleted,
+              onboardingDismissed: reason === "skip" && !settingsSnapshot.onboardingCompleted,
+            });
+          }
+          setVisitedPages((current) => (
+            wizardSource === "settings" && !current.settings
+              ? { ...current, settings: true }
+              : current
+          ));
+          setPage(wizardSource === "settings" ? "settings" : "import");
+          setWizardSource(null);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="app-page-stack bg-background text-foreground antialiased">
       <PageSlot active={page === "import"}>
@@ -168,7 +202,15 @@ function AppContent() {
       ) : null}
       {visitedPages.settings ? (
         <PageSlot active={page === "settings"}>
-          <SettingsPage activePage={page} onNavigate={handleNavigate} />
+          <SettingsPage
+            activePage={page}
+            onNavigate={handleNavigate}
+            onOpenTidyHelper={() => {
+              setVisitedPages((current) => (current.settings ? current : { ...current, settings: true }));
+              setPage("settings");
+              setWizardSource("settings");
+            }}
+          />
         </PageSlot>
       ) : null}
     </div>

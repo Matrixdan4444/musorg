@@ -82,8 +82,42 @@ def get_accent_color() -> str:
     return accent_color
 
 
+def _has_meaningful_existing_setup(settings: dict[str, object], *, env_override_present: bool = False) -> bool:
+    if env_override_present:
+        return True
+    if str(settings.get("library_root") or "").strip():
+        return True
+    if str(settings.get("output_root") or "").strip():
+        return True
+    return any(
+        key in settings
+        for key in (
+            "duplicate_handling",
+            "filename_compatibility",
+            "output_format",
+            "metadata_preservation",
+        )
+    )
+
+
+def _resolve_onboarding_state(
+    settings: dict[str, object],
+    *,
+    env_override_present: bool = False,
+) -> tuple[bool, bool]:
+    inferred_completed = _has_meaningful_existing_setup(settings, env_override_present=env_override_present)
+    completed_raw = settings.get("onboarding_completed")
+    dismissed_raw = settings.get("onboarding_dismissed")
+    completed = completed_raw if isinstance(completed_raw, bool) else inferred_completed
+    dismissed = dismissed_raw if isinstance(dismissed_raw, bool) else False
+    if completed:
+        return True, False
+    return False, dismissed
+
+
 def get_library_settings_state() -> LibrarySettingsResponse:
     env_override = (os.environ.get("MUSORG_LIBRARY_PATH") or "").strip()
+    settings = _read_settings()
     output_root = get_effective_output_root()
     developer_mode = is_developer_mode_enabled()
     language = get_language()
@@ -93,6 +127,10 @@ def get_library_settings_state() -> LibrarySettingsResponse:
     filename_compatibility = filename_compatibility_settings_to_api(_read_filename_compatibility())
     output_format = output_format_settings_to_api(_read_output_format())
     metadata_preservation = normalize_metadata_preservation_settings(_read_metadata_preservation())
+    onboarding_completed, onboarding_dismissed = _resolve_onboarding_state(
+        settings,
+        env_override_present=bool(env_override),
+    )
 
     if env_override:
         normalized = _normalize_path(env_override)
@@ -108,6 +146,8 @@ def get_library_settings_state() -> LibrarySettingsResponse:
             filenameCompatibility=filename_compatibility,
             outputFormat=output_format,
             metadataPreservation=metadata_preservation,
+            onboardingCompleted=onboarding_completed,
+            onboardingDismissed=onboarding_dismissed,
             isConfigured=True,
             isAvailable=error is None,
             source="environment",
@@ -116,7 +156,6 @@ def get_library_settings_state() -> LibrarySettingsResponse:
             error=error,
         )
 
-    settings = _read_settings()
     library_root = str(settings.get("library_root") or "").strip()
     if not library_root:
         return LibrarySettingsResponse(
@@ -130,6 +169,8 @@ def get_library_settings_state() -> LibrarySettingsResponse:
             filenameCompatibility=filename_compatibility,
             outputFormat=output_format,
             metadataPreservation=metadata_preservation,
+            onboardingCompleted=onboarding_completed,
+            onboardingDismissed=onboarding_dismissed,
             isConfigured=False,
             isAvailable=False,
             source="none",
@@ -151,6 +192,8 @@ def get_library_settings_state() -> LibrarySettingsResponse:
         filenameCompatibility=filename_compatibility,
         outputFormat=output_format,
         metadataPreservation=metadata_preservation,
+        onboardingCompleted=onboarding_completed,
+        onboardingDismissed=onboarding_dismissed,
         isConfigured=True,
         isAvailable=error is None,
         source="settings",
@@ -171,6 +214,8 @@ def save_library_settings(
     filename_compatibility: str = "preserve_original",
     output_format: dict | None = None,
     metadata_preservation: dict | None = None,
+    onboarding_completed: bool | None = None,
+    onboarding_dismissed: bool | None = None,
 ) -> LibrarySettingsResponse:
     if str(library_root or "").strip():
         normalized_library = validate_library_root(library_root)
@@ -182,6 +227,16 @@ def save_library_settings(
     normalized_metadata_preservation = normalize_metadata_preservation_settings(metadata_preservation)
     normalized_duplicate_handling = normalize_duplicate_handling_settings(duplicate_handling)
     normalized_filename_compatibility = normalize_filename_compatibility_settings(filename_compatibility)
+    current_settings = _read_settings()
+    current_onboarding_completed, current_onboarding_dismissed = _resolve_onboarding_state(current_settings)
+    normalized_onboarding_completed = (
+        current_onboarding_completed if onboarding_completed is None else bool(onboarding_completed)
+    )
+    normalized_onboarding_dismissed = (
+        current_onboarding_dismissed if onboarding_dismissed is None else bool(onboarding_dismissed)
+    )
+    if normalized_onboarding_completed:
+        normalized_onboarding_dismissed = False
 
     settings_dir = _settings_dir()
     settings_path = _settings_path()
@@ -203,6 +258,8 @@ def save_library_settings(
                 "filename_compatibility": normalized_filename_compatibility,
                 "output_format": normalized_output_format,
                 "metadata_preservation": normalized_metadata_preservation,
+                "onboarding_completed": normalized_onboarding_completed,
+                "onboarding_dismissed": normalized_onboarding_dismissed,
             },
             indent=2,
         ),

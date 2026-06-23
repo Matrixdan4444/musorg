@@ -108,6 +108,12 @@ npm run build
 python -m musorg.desktop_webview
 ```
 
+To force the first-run setup wizard from Terminal, use:
+
+```bash
+python -m musorg.desktop_webview --setup-wizard
+```
+
 ## Package the macOS app
 
 Build `Musorg.app` and a drag-to-install `.dmg` (after the frontend build

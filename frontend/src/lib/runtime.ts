@@ -6,6 +6,7 @@ export interface RuntimeConfig {
   hostKind: HostKind;
   apiBaseUrl: string;
   frontendOrigin: string;
+  forceSetupWizard: boolean;
 }
 
 
@@ -14,11 +15,13 @@ function readQueryConfig() {
   const apiOrigin = params.get("api_origin")?.trim() ?? "";
   const runtimeMode = params.get("runtime_mode")?.trim() ?? "";
   const hostKind = params.get("host_kind")?.trim() ?? "";
+  const forceSetupWizard = params.get("force_setup_wizard")?.trim() ?? "";
 
   return {
     apiOrigin,
     runtimeMode,
     hostKind,
+    forceSetupWizard,
   };
 }
 
@@ -39,5 +42,6 @@ export function getRuntimeConfig(): RuntimeConfig {
     hostKind: query.hostKind === "pywebview" ? "pywebview" : "browser",
     apiBaseUrl,
     frontendOrigin,
+    forceSetupWizard: query.forceSetupWizard === "1" || query.forceSetupWizard.toLowerCase() === "true",
   };
 }

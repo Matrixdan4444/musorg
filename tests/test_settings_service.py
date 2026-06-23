@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +10,86 @@ from musorg.api.services import settings as settings_service
 
 
 class SettingsServiceTests(unittest.TestCase):
+    def test_fresh_install_requires_onboarding(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            settings_dir = root / ".musorg"
+            settings_path = settings_dir / "settings.json"
+
+            with patch.dict("os.environ", {
+                "MUSORG_LIBRARY_PATH": "",
+                "MUSORG_SETTINGS_DIR": str(settings_dir),
+                "MUSORG_SETTINGS_PATH": str(settings_path),
+            }, clear=False):
+                payload = settings_service.get_library_settings_state()
+
+            self.assertFalse(payload.onboardingCompleted)
+            self.assertFalse(payload.onboardingDismissed)
+
+    def test_existing_config_without_onboarding_flags_is_treated_as_completed(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            library = root / "library"
+            output = root / "output"
+            settings_dir = root / ".musorg"
+            settings_path = settings_dir / "settings.json"
+            library.mkdir()
+            output.mkdir()
+            settings_dir.mkdir()
+            settings_path.write_text(
+                json.dumps({
+                    "library_root": str(library),
+                    "output_root": str(output),
+                    "language": "en",
+                    "output_format": {
+                        "album_folder_preset": "artist_album",
+                    },
+                }),
+                encoding="utf-8",
+            )
+
+            with patch.dict("os.environ", {
+                "MUSORG_LIBRARY_PATH": "",
+                "MUSORG_SETTINGS_DIR": str(settings_dir),
+                "MUSORG_SETTINGS_PATH": str(settings_path),
+            }, clear=False):
+                payload = settings_service.get_library_settings_state()
+
+            self.assertTrue(payload.onboardingCompleted)
+            self.assertFalse(payload.onboardingDismissed)
+
+    def test_save_library_settings_preserves_onboarding_flags(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            library = root / "library"
+            output = root / "output"
+            settings_dir = root / ".musorg"
+            settings_path = settings_dir / "settings.json"
+            library.mkdir()
+            output.mkdir()
+
+            with patch.dict("os.environ", {
+                "MUSORG_LIBRARY_PATH": "",
+                "MUSORG_SETTINGS_DIR": str(settings_dir),
+                "MUSORG_SETTINGS_PATH": str(settings_path),
+            }, clear=False):
+                initial = settings_service.save_library_settings(
+                    str(library),
+                    str(output),
+                    onboarding_completed=False,
+                    onboarding_dismissed=True,
+                )
+                reloaded = settings_service.save_library_settings(
+                    str(library),
+                    str(output),
+                    duplicate_handling="move_duplicates_to_archive",
+                )
+
+            self.assertFalse(initial.onboardingCompleted)
+            self.assertTrue(initial.onboardingDismissed)
+            self.assertFalse(reloaded.onboardingCompleted)
+            self.assertTrue(reloaded.onboardingDismissed)
+
     def test_save_library_settings_persists_developer_mode_language_and_appearance(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)

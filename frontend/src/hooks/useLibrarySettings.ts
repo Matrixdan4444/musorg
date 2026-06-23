@@ -56,6 +56,8 @@ export function useLibrarySettings() {
     filenameCompatibility: overrides.filenameCompatibility ?? data?.filenameCompatibility ?? "preserve_original",
     outputFormat: overrides.outputFormat ?? data?.outputFormat ?? defaultOutputFormatSettings(),
     metadataPreservation: overrides.metadataPreservation ?? data?.metadataPreservation ?? defaultMetadataPreservationSettings(),
+    onboardingCompleted: overrides.onboardingCompleted ?? data?.onboardingCompleted ?? false,
+    onboardingDismissed: overrides.onboardingDismissed ?? data?.onboardingDismissed ?? false,
   }), [data]);
 
   const refetch = useCallback(async () => {
@@ -206,6 +208,22 @@ export function useLibrarySettings() {
     }
   }, [applyResolvedPayload, buildSettingsPayload, t]);
 
+  const saveOnboardingState = useCallback(async (onboardingCompleted: boolean, onboardingDismissed: boolean) => {
+    try {
+      setSaving(true);
+      setError(null);
+      setMessage(null);
+      const payload = await setLibrarySettings(buildSettingsPayload({ onboardingCompleted, onboardingDismissed }));
+      return applyResolvedPayload(payload);
+    } catch (err) {
+      const nextError = err instanceof Error ? err.message : t("settings.errors.save");
+      setError(nextError);
+      return null;
+    } finally {
+      setSaving(false);
+    }
+  }, [applyResolvedPayload, buildSettingsPayload, t]);
+
   const pickLibraryRoot = useCallback(async () => {
     try {
       setPicking(true);
@@ -287,6 +305,7 @@ export function useLibrarySettings() {
     saveAccentColor,
     saveDuplicateHandling,
     saveFilenameCompatibility,
+    saveOnboardingState,
     saveOutputFormat,
     saveMetadataPreservation,
     clearCache,

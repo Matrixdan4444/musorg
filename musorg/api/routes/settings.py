@@ -38,6 +38,8 @@ def update_library_settings(payload: UpdateLibrarySettingsRequest) -> LibrarySet
         payload.filenameCompatibility,
         payload.outputFormat.model_dump(),
         payload.metadataPreservation.model_dump(),
+        payload.onboardingCompleted,
+        payload.onboardingDismissed,
     )
 
 

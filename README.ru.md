@@ -109,6 +109,12 @@ npm run build
 python -m musorg.desktop_webview
 ```
 
+Чтобы принудительно открыть мастер первичной настройки из Терминала, используйте:
+
+```bash
+python -m musorg.desktop_webview --setup-wizard
+```
+
 ## Упаковка приложения для macOS
 
 Соберите `Musorg.app` и `.dmg` для установки перетаскиванием (после сборки

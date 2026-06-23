@@ -1,3 +1,4 @@
+import { sampleAlbumCover } from "@/lib/sample-cover";
 import type {
   AlbumFolderPreset,
   DiscHandlingMode,
@@ -40,6 +41,18 @@ export interface OutputPreviewTree {
   albumRootLabel: string;
   tree: PreviewNode[];
   warnings: PreviewWarning[];
+}
+
+export interface OutputPreviewMockupModel {
+  albumRootLabel: string;
+  pathSegments: string[];
+  sampleTrackFilenames: string[];
+  discFolders: string[];
+  warningSummary: string | null;
+  warnings: PreviewWarning[];
+  hasArtwork: boolean;
+  totalTracks: number;
+  discCount: number;
 }
 
 export function defaultOutputFormatSettings(): OutputFormatSettings {
@@ -88,6 +101,42 @@ export function buildOutputPreviewTree(
   };
 }
 
+export function buildOutputPreviewMockupModel(
+  album: OutputPreviewAlbum,
+  preview: OutputPreviewTree,
+): OutputPreviewMockupModel {
+  const pathSegments = preview.albumRootLabel ? preview.albumRootLabel.split(" / ").filter(Boolean) : [];
+  const discFolders: string[] = [];
+  const sampleTrackFilenames: string[] = [];
+
+  for (const node of preview.tree) {
+    if (node.kind === "folder") {
+      if (node.depth >= pathSegments.length) {
+        discFolders.push(node.label);
+      }
+      continue;
+    }
+
+    if (node.label.toLowerCase().endsWith(".flac")) {
+      sampleTrackFilenames.push(node.label);
+    }
+  }
+
+  const discCount = Math.max(1, ...album.tracks.map((track) => track.discNumber || 1));
+
+  return {
+    albumRootLabel: preview.albumRootLabel,
+    pathSegments,
+    sampleTrackFilenames: sampleTrackFilenames.slice(0, 4),
+    discFolders,
+    warningSummary: preview.warnings[0]?.title ?? null,
+    warnings: preview.warnings,
+    hasArtwork: Boolean(album.coverUrl),
+    totalTracks: album.tracks.length,
+    discCount,
+  };
+}
+
 function previewSafeName(value: string, mode: FilenameCompatibilityMode): string {
   if (!value) {
     return "Unknown";
@@ -114,17 +163,25 @@ function splitExtension(value: string): [string, string] {
 }
 
 export function samplePreviewAlbum(): OutputPreviewAlbum {
+  const artist = "Pink Floyd";
   return {
-    title: "Down Underground",
-    artist: "The Liminanas",
-    albumArtist: "The Liminanas",
-    year: "2015",
-    genre: "Rock",
-    coverUrl: "",
+    title: "The Dark Side of the Moon",
+    artist,
+    albumArtist: artist,
+    year: "1973",
+    genre: "Progressive Rock",
+    coverUrl: sampleAlbumCover,
     tracks: [
-      { title: "The Darkside", artist: "The Liminanas", trackNumber: 1, discNumber: 1 },
-      { title: "Down Underground", artist: "The Liminanas", trackNumber: 2, discNumber: 1 },
-      { title: "Je ne suis pas tres drogue", artist: "The Liminanas", trackNumber: 3, discNumber: 1 },
+      { title: "Speak to Me", artist, trackNumber: 1, discNumber: 1 },
+      { title: "Breathe (In the Air)", artist, trackNumber: 2, discNumber: 1 },
+      { title: "On the Run", artist, trackNumber: 3, discNumber: 1 },
+      { title: "Time", artist, trackNumber: 4, discNumber: 1 },
+      { title: "The Great Gig in the Sky", artist, trackNumber: 5, discNumber: 1 },
+      { title: "Money", artist, trackNumber: 6, discNumber: 1 },
+      { title: "Us and Them", artist, trackNumber: 7, discNumber: 1 },
+      { title: "Any Colour You Like", artist, trackNumber: 8, discNumber: 1 },
+      { title: "Brain Damage", artist, trackNumber: 9, discNumber: 1 },
+      { title: "Eclipse", artist, trackNumber: 10, discNumber: 1 },
     ],
   };
 }

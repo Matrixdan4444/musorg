@@ -20,6 +20,9 @@ frontend/*.tsbuildinfo
 # test/ are tracked because tests/test_match_stress_parts.py needs them)
 test/results/
 
+# Local editor / agent tooling
+.claude/
+
 # Local temp / runtime
 .tmp-home/
 .tmp-phase3-home/

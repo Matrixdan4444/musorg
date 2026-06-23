@@ -4,9 +4,11 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { FieldHelp } from "@/components/FieldHelp";
 import { Panel } from "@/components/Panel";
+import { OutputPreviewMockup, OutputPresetMiniPreview } from "@/components/preview/OutputPreviewMockup";
 import { useI18n } from "@/i18n/useI18n";
 import {
   albumFolderPresetOrder,
+  buildOutputPreviewMockupModel,
   buildOutputPreviewTree,
   collapseDuplicateLeadingYear,
   defaultOutputFormatSettings,
@@ -67,7 +69,10 @@ export function OutputFolderFormatCard({
     () => buildOutputPreviewTree(previewAlbum, draft, filenameCompatibility),
     [draft, filenameCompatibility, previewAlbum],
   );
-  const folderPresetCards = useMemo(() => buildFolderPresetCards(translate, previewAlbum), [previewAlbum, t]);
+  const folderPresetCards = useMemo(
+    () => buildFolderPresetCards(translate, previewAlbum, draft, filenameCompatibility),
+    [draft, filenameCompatibility, previewAlbum, t],
+  );
   const discOptions = useMemo(() => buildDiscOptions(translate), [t]);
   const fileNamingOptions = useMemo(() => buildFileNamingOptions(translate), [t]);
   const separatorOptions = useMemo(() => buildSeparatorOptions(translate), [t]);
@@ -168,13 +173,10 @@ export function OutputFolderFormatCard({
                         </span>
                       ) : null}
                     </div>
-                    <div className="mt-4 rounded-[18px] bg-surface-contrast/85 px-3 py-2.5">
-                      {card.preview.map((line) => (
-                        <p key={line} className="break-words font-mono text-[11px] leading-5 text-[hsl(var(--text-base))]">
-                          {line}
-                        </p>
-                      ))}
-                    </div>
+                    <OutputPresetMiniPreview
+                      fileExample={card.mockup.sampleTrackFilenames[0]}
+                      pathSegments={card.mockup.pathSegments}
+                    />
                   </motion.button>
                 );
               })}
@@ -193,47 +195,18 @@ export function OutputFolderFormatCard({
             <div className="border-b border-border-soft/75 px-5 py-4">
               <p className="text-[12px] text-muted-foreground">{t("settings.outputFormat.previewSubtitle")}</p>
             </div>
-
-            <div className="space-y-3 px-5 py-5">
-              <div className="space-y-0.5">
-                {preview.tree.map((node, index) => (
-                  <div
-                    key={`${node.label}-${index}`}
-                    className="flex items-start gap-2.5"
-                    style={{ paddingLeft: `${node.depth * 16}px` }}
-                  >
-                    <span className="mt-[3px] shrink-0">
-                      {node.kind === "folder"
-                        ? index === preview.tree.findIndex((entry) => entry.label === node.label && entry.depth === node.depth)
-                          ? <FolderOpen className="h-4 w-4 text-[hsl(var(--info-fg))]" />
-                          : <Folder className="h-4 w-4 text-[hsl(var(--info-fg))]" />
-                        : <FileMusic className="h-4 w-4 text-muted-foreground" />}
-                    </span>
-                    <span
-                      className={cn(
-                        "min-w-0 break-words text-[13px] leading-6",
-                        node.kind === "folder" ? "text-[hsl(var(--text-strong))]" : "text-[hsl(var(--text-base))]",
-                      )}
-                    >
-                      {node.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {preview.warnings.length ? (
-                <div className="border-t border-border-soft/75 pt-3">
-                  {preview.warnings.map((warning) => (
-                    <div key={warning.id} className="flex items-start gap-2 text-[12px] leading-5 text-[hsl(var(--warning-fg))]">
-                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--warning-fg))]" />
-                      <div>
-                        <p className="font-medium text-[hsl(var(--warning-fg))]">{warning.title}</p>
-                        <p>{warning.message}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
+            <div className="px-5 py-5">
+              <OutputPreviewMockup
+                album={previewAlbum}
+                albumFolderPreset={draft.albumFolderPreset}
+                discHandling={draft.discHandling}
+                duplicateHandling={undefined}
+                fileNaming={draft.fileNaming}
+                filenameCompatibility={filenameCompatibility}
+                outputRoot={undefined}
+                preview={preview}
+                sourceRoot={undefined}
+              />
             </div>
           </div>
         </section>
@@ -482,32 +455,53 @@ function AdvancedSection({
   );
 }
 
-function buildFolderPresetCards(t: (key: string, values?: Record<string, string | number>) => string, album: ReturnType<typeof samplePreviewAlbum>) {
+function buildFolderPresetCards(
+  t: (key: string, values?: Record<string, string | number>) => string,
+  album: ReturnType<typeof samplePreviewAlbum>,
+  draft: OutputFormatSettings,
+  filenameCompatibility: FilenameCompatibilityMode,
+) {
+  const buildMockup = (albumFolderPreset: AlbumFolderPreset, customAlbumPattern = draft.customAlbumPattern) => {
+    return buildOutputPreviewMockupModel(
+      album,
+      buildOutputPreviewTree(album, {
+        ...draft,
+        albumFolderPreset,
+        customAlbumPattern,
+      }, filenameCompatibility),
+    );
+  };
+
   return {
     artist_year_album: {
       title: t("settings.outputFormat.presets.artistYearAlbum.title"),
       description: t("settings.outputFormat.presets.artistYearAlbum.description"),
       preview: [`${album.albumArtist}/${collapseDuplicateLeadingYear(`${album.year} - ${album.title}`)}`],
+      mockup: buildMockup("artist_year_album"),
     },
     artist_album_year: {
       title: t("settings.outputFormat.presets.artistAlbumYear.title"),
       description: t("settings.outputFormat.presets.artistAlbumYear.description"),
       preview: [`${album.albumArtist}/${album.title} (${album.year})`],
+      mockup: buildMockup("artist_album_year"),
     },
     artist_album: {
       title: t("settings.outputFormat.presets.artistAlbum.title"),
       description: t("settings.outputFormat.presets.artistAlbum.description"),
       preview: [`${album.albumArtist}/${album.title}`],
+      mockup: buildMockup("artist_album"),
     },
     genre_artist_album: {
       title: t("settings.outputFormat.presets.genreArtistAlbum.title"),
       description: t("settings.outputFormat.presets.genreArtistAlbum.description"),
       preview: [`${album.genre}/${album.albumArtist}/${album.title}`],
+      mockup: buildMockup("genre_artist_album"),
     },
     custom: {
       title: t("settings.outputFormat.presets.custom.title"),
       description: t("settings.outputFormat.presets.custom.description"),
       preview: [t("settings.outputFormat.presets.custom.preview")],
+      mockup: buildMockup("custom"),
     },
   } as const;
 }

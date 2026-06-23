@@ -15,6 +15,94 @@ export const ru: LocaleShape<typeof en> = {
     errors: {
       backendUnavailable: "Не удалось подключиться к встроенному сервису.",
     },
+    onboarding: {
+      eyebrow: "Быстрая настройка",
+      loadingTitle: "Готовим всё к работе",
+      loadingDetail: "Загружаем ваши настройки и пример для предпросмотра.",
+      skip: "Пропустить — настрою позже",
+      closeForNow: "Закрыть",
+      back: "Назад",
+      next: "Далее",
+      finish: "Открыть Musorg",
+      stepCounter: "Шаг {current} из {total}",
+      previewLabel: "Предпросмотр",
+      previewDetail: "Меняете настройки — предпросмотр сразу обновляется.",
+      languageEnglish: "Интерфейс на английском.",
+      languageRussian: "Интерфейс на русском.",
+      hero: {
+        feature1Title: "Аккуратные папки",
+        feature1Detail: "Каждый альбом — в своей опрятной папке.",
+        feature2Title: "Понятные имена",
+        feature2Detail: "Единый стиль названий для всех треков.",
+        feature3Title: "Ничего не теряется",
+        feature3Detail: "Дубликаты под контролем, имена — безопасные.",
+      },
+      stepNames: {
+        welcome: "Начало",
+        appearance: "Оформление",
+        folders: "Папки",
+        albums: "Альбомы",
+        tracks: "Треки",
+        safety: "Сохранность",
+        review: "Итог",
+      },
+      steps: {
+        welcome: {
+          title: "Привет! Это Musorg",
+          description: "Musorg наводит порядок в вашей музыкальной коллекции. Для начала — на каком языке вам удобнее?",
+        },
+        appearance: {
+          title: "Настройте внешний вид",
+          description: "Светлая или тёмная тема и любимый цвет. Всё применяется мгновенно — справа сразу видно результат.",
+        },
+        folders: {
+          title: "Где лежит музыка?",
+          description: "Укажите, откуда брать файлы и куда сложить приведённую в порядок копию. Оригиналы остаются нетронутыми.",
+        },
+        albums: {
+          title: "Как раскладывать альбомы?",
+          description: "Выберите, в каком виде Musorg будет создавать папки для альбомов.",
+        },
+        tracks: {
+          title: "Как называть треки?",
+          description: "Выберите формат имён файлов и то, как поступать с альбомами на нескольких дисках.",
+        },
+        safety: {
+          title: "Аккуратность и сохранность",
+          description: "Что делать с дубликатами и приводить ли имена к виду, понятному любой системе.",
+        },
+        review: {
+          title: "Почти готово — взгляните",
+          description: "Краткая сводка главных настроек. Любую можно изменить позже в настройках.",
+        },
+      },
+      appearance: {
+        themeLabel: "Тема",
+        accentLabel: "Цвет акцента",
+      },
+      folders: {
+        library: "Откуда брать музыку",
+        output: "Куда сохранять результат",
+        pickLibrary: "Выбрать папку",
+        pickOutput: "Выбрать папку",
+      },
+      trackNaming: {
+        patternLabel: "Формат имён файлов",
+        discsLabel: "Альбомы на нескольких дисках",
+      },
+      safety: {
+        duplicatesLabel: "Дубликаты",
+        compatibilityLabel: "Совместимость имён",
+      },
+      review: {
+        library: "Папка с музыкой",
+        output: "Папка результата",
+        albumFormat: "Раскладка альбомов",
+        trackNaming: "Имена треков",
+        duplicates: "Дубликаты",
+        compatibility: "Совместимость имён",
+      },
+    },
   },
   common: {
     cancel: "Отмена",
@@ -91,6 +179,9 @@ export const ru: LocaleShape<typeof en> = {
     clearCacheTitle: "Очистить кэш",
     clearCacheDescription: "Очищает сохраненные решения провайдеров, чтобы Musorg мог заново проверить тот же релиз.",
     clearCacheAction: "Очистить кэш",
+    tidyHelperTitle: "Tidy-Up Helper",
+    tidyHelperDescription: "Снова откройте guided first-run setup, чтобы пересмотреть структуру папок, имена файлов и правила обработки дублей с живыми превью.",
+    tidyHelperAction: "Запустить Tidy-Up Helper",
     cacheCleared: "Кэш очищен.",
     cacheClearedCount: "Кэш очищен. Удалено записей кэша метаданных: {count}.",
     duplicateHandling: {
@@ -102,17 +193,17 @@ export const ru: LocaleShape<typeof en> = {
       options: {
         keepEverything: {
           title: "Оставлять всё",
-          description: "Никогда не перемещать дубликаты автоматически.",
+          description: "Ничего не перемещаем сами — все копии на месте.",
           example: "Artist/Album (MP3) и Artist/Album (FLAC) остаются на месте.",
         },
         preferBestVersion: {
-          title: "Предпочитать лучшую версию",
-          description: "Помечать сильную версию как предпочтительную без перемещения файлов.",
+          title: "Отметить лучшую копию",
+          description: "Подскажем, какая версия лучше, но файлы трогать не будем.",
           example: "FLAC становится предпочтительной версией. MP3 остаётся как более слабая копия.",
         },
         moveDuplicatesToArchive: {
-          title: "Перемещать дубликаты в архив",
-          description: "Архивировать явно более слабые дубликаты только при высокой уверенности.",
+          title: "Слабые копии — в архив",
+          description: "Уберём в архив явно худшие копии — и только когда уверены.",
           example: "Output/Archive/Album (MP3), а сильная FLAC-копия остаётся в Output/Artist/Year - Album.",
         },
       },
@@ -125,12 +216,12 @@ export const ru: LocaleShape<typeof en> = {
       help: "Это влияет только на имена файлов и папок. Музыкальные метаданные не меняются.",
       options: {
         preserveOriginal: {
-          title: "Сохранять исходные символы",
-          description: "Оставлять имена максимально близкими к исходным метаданным.",
+          title: "Как в оригинале",
+          description: "Имена остаются максимально близкими к исходным.",
         },
         crossPlatformSafe: {
-          title: "Безопасно для разных платформ",
-          description: "Нормализовать символы, которые часто вызывают проблемы совместимости.",
+          title: "Безопасно везде",
+          description: "Уберём символы, с которыми спорят Windows, macOS и Linux.",
         },
       },
     },
@@ -170,6 +261,26 @@ export const ru: LocaleShape<typeof en> = {
       previewSubtitle: "Легкий предпросмотр того, что запишет Musorg.",
       previewHelpLabel: "Подсказка по предпросмотру",
       previewHelp: "Посмотрите готовое дерево папок до запуска обработки.",
+      previewMockup: {
+        windowTitle: "Предпросмотр результата в Musorg",
+        liveLabel: "Живой результат",
+        noArtwork: "Без обложки",
+        tracksStat: "треков",
+        discsStat: "дисков",
+        rulesStat: "правил",
+        sourceLabel: "Читает из",
+        destinationLabel: "Запишет в",
+        sourcePlaceholder: "Выберите папку библиотеки, чтобы показать источник.",
+        destinationPlaceholder: "Выберите выходную папку, чтобы показать результат.",
+        pathLabel: "Итоговый путь в библиотеке",
+        fileExampleLabel: "Пример первого файла",
+        trackExamplesLabel: "Примеры треков",
+        discFoldersLabel: "Папки дисков",
+        rulesLabel: "Активные правила",
+        warningLabel: "Требует внимания",
+        readyLabel: "Готово к обработке",
+        readyDescription: "Эта раскладка выглядит понятно, и Musorg сможет применить её сразу после запуска импорта.",
+      },
       presets: {
         artistYearAlbum: {
           title: "Артист / Год - Альбом",

@@ -188,7 +188,7 @@ def attach_or_spawn_vite() -> tuple[str, ManagedViteProcess | None]:
 
 
 @contextlib.contextmanager
-def managed_runtime_server(mode: str) -> tuple[EmbeddedApiServer, RuntimeUrls, ManagedViteProcess | None]:
+def managed_runtime_server(mode: str, *, force_setup_wizard: bool = False) -> tuple[EmbeddedApiServer, RuntimeUrls, ManagedViteProcess | None]:
     if mode == "dev":
         vite_origin, vite_process = attach_or_spawn_vite()
         api_server = EmbeddedApiServer(create_dev_app(vite_origin))
@@ -196,7 +196,7 @@ def managed_runtime_server(mode: str) -> tuple[EmbeddedApiServer, RuntimeUrls, M
         urls = RuntimeUrls(
             api_origin=api_server.origin,
             frontend_origin=vite_origin,
-            frontend_url=build_frontend_url(vite_origin, api_server.origin, "dev"),
+            frontend_url=build_frontend_url(vite_origin, api_server.origin, "dev", force_setup_wizard=force_setup_wizard),
         )
     else:
         frontend_dist = ensure_frontend_dist_exists()
@@ -205,7 +205,7 @@ def managed_runtime_server(mode: str) -> tuple[EmbeddedApiServer, RuntimeUrls, M
         urls = RuntimeUrls(
             api_origin=api_server.origin,
             frontend_origin=api_server.origin,
-            frontend_url=build_frontend_url(api_server.origin, api_server.origin, "embedded"),
+            frontend_url=build_frontend_url(api_server.origin, api_server.origin, "embedded", force_setup_wizard=force_setup_wizard),
         )
         vite_process = None
 
@@ -217,9 +217,12 @@ def managed_runtime_server(mode: str) -> tuple[EmbeddedApiServer, RuntimeUrls, M
             vite_process.stop()
 
 
-def build_frontend_url(frontend_origin: str, api_origin: str, runtime_mode: str) -> str:
-    return (
+def build_frontend_url(frontend_origin: str, api_origin: str, runtime_mode: str, *, force_setup_wizard: bool = False) -> str:
+    url = (
         f"{frontend_origin}/?api_origin={api_origin}"
         f"&runtime_mode={runtime_mode}"
         "&host_kind=pywebview"
     )
+    if force_setup_wizard:
+        url += "&force_setup_wizard=1"
+    return url

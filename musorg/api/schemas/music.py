@@ -81,6 +81,8 @@ class LibrarySettingsResponse(BaseModel):
     filenameCompatibility: FilenameCompatibilityMode = "preserve_original"
     outputFormat: OutputFormatSettingsSchema = OutputFormatSettingsSchema()
     metadataPreservation: MetadataPreservationSettingsSchema = Field(default_factory=MetadataPreservationSettingsSchema)
+    onboardingCompleted: bool = False
+    onboardingDismissed: bool = False
     isConfigured: bool
     isAvailable: bool
     source: Literal["settings", "environment", "none"]
@@ -100,6 +102,8 @@ class UpdateLibrarySettingsRequest(BaseModel):
     filenameCompatibility: FilenameCompatibilityMode = "preserve_original"
     outputFormat: OutputFormatSettingsSchema = OutputFormatSettingsSchema()
     metadataPreservation: MetadataPreservationSettingsSchema = Field(default_factory=MetadataPreservationSettingsSchema)
+    onboardingCompleted: bool | None = None
+    onboardingDismissed: bool | None = None
 
 
 class LibraryPickerResponse(BaseModel):
